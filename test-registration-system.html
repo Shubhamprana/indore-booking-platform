@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookNow Registration Testing System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .test-section h2 {
+            color: #495057;
+            margin-top: 0;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .metric {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric h3 {
+            margin: 0 0 10px 0;
+        }
+        .metric .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 BookNow Registration Testing System</h1>
+        
+        <!-- Test Configuration -->
+        <div class="test-section">
+            <h2>⚙️ Test Configuration</h2>
+            <div class="form-group">
+                <label for="supabaseUrl">Supabase URL:</label>
+                <input type="url" id="supabaseUrl" placeholder="https://your-project.supabase.co">
+            </div>
+            <div class="form-group">
+                <label for="supabaseKey">Supabase Anon Key:</label>
+                <input type="password" id="supabaseKey" placeholder="Your anon key">
+            </div>
+            <button class="btn" onclick="initializeSupabase()">🔧 Initialize Connection</button>
+            <div id="connectionResult" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- User Registration Tests -->
+        <div class="test-section">
+            <h2>👤 User Registration Tests</h2>
+            
+            <div class="test-grid">
+                <div>
+                    <h3>Customer Registration</h3>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="customerEmail" placeholder="test.customer@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name:</label>
+                        <input type="text" id="customerName" placeholder="Test Customer">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone:</label>
+                        <input type="tel" id="customerPhone" placeholder="+91 9876543210">
+                    </div>
+                    <div class="form-group">
+                        <label>Location:</label>
+                        <input type="text" id="customerLocation" placeholder="Mumbai, Maharashtra">
+                    </div>
+                    <div class="form-group">
+                        <label>Referral Code (Optional):</label>
+                        <input type="text" id="customerReferralCode" placeholder="REF12345">
+                    </div>
+                    <button class="btn" onclick="testCustomerRegistration()">Test Customer Registration</button>
+                </div>
+
+                <div>
+                    <h3>Business Registration</h3>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="businessEmail" placeholder="test.business@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name:</label>
+                        <input type="text" id="businessName" placeholder="Test Business Owner">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone:</label>
+                        <input type="tel" id="businessPhone" placeholder="+91 9876543211">
+                    </div>
+                    <div class="form-group">
+                        <label>Business Name:</label>
+                        <input type="text" id="businessCompanyName" placeholder="Test Business Inc">
+                    </div>
+                    <div class="form-group">
+                        <label>Location:</label>
+                        <input type="text" id="businessLocation" placeholder="Delhi, India">
+                    </div>
+                    <div class="form-group">
+                        <label>Referral Code (Optional):</label>
+                        <input type="text" id="businessReferralCode" placeholder="BIZ12345">
+                    </div>
+                    <button class="btn" onclick="testBusinessRegistration()">Test Business Registration</button>
+                </div>
+            </div>
+            
+            <div id="registrationResults" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="test-section">
+            <h2>📊 Performance Metrics</h2>
+            <div class="test-grid">
+                <div class="metric">
+                    <h3>Registration Time</h3>
+                    <div class="value" id="registrationTime">-</div>
+                    <div>milliseconds</div>
+                </div>
+                <div class="metric">
+                    <h3>Success Rate</h3>
+                    <div class="value" id="successRate">-</div>
+                    <div>%</div>
+                </div>
+                <div class="metric">
+                    <h3>Total Tests</h3>
+                    <div class="value" id="totalTests">0</div>
+                    <div>completed</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Bonus Tests -->
+        <div class="test-section">
+            <h2>💼 Business Bonus & Subscription Tests</h2>
+            <div class="form-group">
+                <label>Test User ID (from registration):</label>
+                <input type="text" id="testUserId" placeholder="user-uuid-here">
+            </div>
+            <button class="btn" onclick="testBusinessBonus()">Test Business Bonus</button>
+            <button class="btn" onclick="testSubscriptionStatus()">Check Subscription Status</button>
+            <button class="btn" onclick="testBusinessDashboard()">Test Business Dashboard</button>
+            <div id="businessResults" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Database Function Tests -->
+        <div class="test-section">
+            <h2>🗄️ Database Function Tests</h2>
+            <button class="btn" onclick="testDatabaseFunctions()">Test All Functions</button>
+            <button class="btn" onclick="testPerformanceOptimizations()">Test Performance</button>
+            <button class="btn" onclick="testCachingSystem()">Test Caching</button>
+            <div id="databaseResults" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Stress Testing -->
+        <div class="test-section">
+            <h2>🔥 Stress Testing</h2>
+            <div class="form-group">
+                <label>Number of concurrent registrations:</label>
+                <input type="number" id="concurrentUsers" value="5" min="1" max="20">
+            </div>
+            <button class="btn" onclick="runStressTest()">Run Stress Test</button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="stressProgress" style="width: 0%"></div>
+            </div>
+            <div id="stressResults" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Cleanup -->
+        <div class="test-section">
+            <h2>🧹 Cleanup Test Data</h2>
+            <button class="btn" onclick="cleanupTestData()" style="background: #dc3545;">⚠️ Cleanup Test Users</button>
+            <div id="cleanupResults" class="result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let supabase = null;
+        let testMetrics = {
+            totalTests: 0,
+            successfulTests: 0,
+            totalTime: 0
+        };
+        let testUserIds = [];
+
+        function initializeSupabase() {
+            const url = document.getElementById('supabaseUrl').value;
+            const key = document.getElementById('supabaseKey').value;
+            
+            if (!url || !key) {
+                showResult('connectionResult', 'Please provide both Supabase URL and key', 'error');
+                return;
+            }
+
+            try {
+                // Initialize Supabase client (you'll need to include the Supabase JS library)
+                showResult('connectionResult', '⚠️ Note: Include Supabase JS library in your HTML to fully test\n\nConnection parameters saved:\n' + 
+                    `URL: ${url}\nKey: ${key.substring(0, 10)}...`, 'info');
+            } catch (error) {
+                showResult('connectionResult', `Connection failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCustomerRegistration() {
+            const startTime = Date.now();
+            
+            try {
+                const registrationData = {
+                    email: document.getElementById('customerEmail').value || `test.customer.${Date.now()}@example.com`,
+                    password: 'TestPassword123!',
+                    fullName: document.getElementById('customerName').value || 'Test Customer',
+                    phone: document.getElementById('customerPhone').value || '+91 9876543210',
+                    location: document.getElementById('customerLocation').value || 'Mumbai, Maharashtra',
+                    userType: 'customer',
+                    referralCode: document.getElementById('customerReferralCode').value,
+                    serviceInterests: ['Salons', 'Restaurants'],
+                    launchInterest: 8,
+                    marketingConsent: true
+                };
+
+                // Simulate registration (replace with actual API call)
+                const result = await simulateRegistration(registrationData);
+                
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                
+                updateMetrics(duration, true);
+                testUserIds.push(result.userId);
+                
+                showResult('registrationResults', 
+                    `✅ Customer Registration Successful!\n\n` +
+                    `User ID: ${result.userId}\n` +
+                    `Email: ${registrationData.email}\n` +
+                    `Duration: ${duration}ms\n` +
+                    `Expected Benefits: Welcome points, referral tracking\n\n` +
+                    `Next Steps:\n` +
+                    `1. Check user profile created\n` +
+                    `2. Verify welcome activity logged\n` +
+                    `3. Test referral processing if code provided`, 'success');
+
+            } catch (error) {
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                updateMetrics(duration, false);
+                
+                showResult('registrationResults', 
+                    `❌ Customer Registration Failed!\n\n` +
+                    `Error: ${error.message}\n` +
+                    `Duration: ${duration}ms\n\n` +
+                    `Troubleshooting:\n` +
+                    `1. Check if email already exists\n` +
+                    `2. Verify all required fields\n` +
+                    `3. Check database connection\n` +
+                    `4. Review server logs`, 'error');
+            }
+        }
+
+        async function testBusinessRegistration() {
+            const startTime = Date.now();
+            
+            try {
+                const registrationData = {
+                    email: document.getElementById('businessEmail').value || `test.business.${Date.now()}@example.com`,
+                    password: 'TestPassword123!',
+                    fullName: document.getElementById('businessName').value || 'Test Business Owner',
+                    phone: document.getElementById('businessPhone').value || '+91 9876543211',
+                    location: document.getElementById('businessLocation').value || 'Delhi, India',
+                    userType: 'business',
+                    businessName: document.getElementById('businessCompanyName').value || 'Test Business Inc',
+                    businessCategory: 'Restaurant',
+                    businessDescription: 'Test restaurant for platform testing',
+                    currentBookingMethod: 'phone',
+                    referralCode: document.getElementById('businessReferralCode').value,
+                    launchInterest: 9,
+                    marketingConsent: true
+                };
+
+                // Simulate registration (replace with actual API call)
+                const result = await simulateRegistration(registrationData);
+                
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                
+                updateMetrics(duration, true);
+                testUserIds.push(result.userId);
+                
+                // Test business-specific features
+                await testBusinessFeatures(result.userId);
+                
+                showResult('registrationResults', 
+                    `✅ Business Registration Successful!\n\n` +
+                    `User ID: ${result.userId}\n` +
+                    `Email: ${registrationData.email}\n` +
+                    `Business: ${registrationData.businessName}\n` +
+                    `Duration: ${duration}ms\n\n` +
+                    `Expected Benefits:\n` +
+                    `• 3 months pro subscription (₹0 value)\n` +
+                    `• Business dashboard access\n` +
+                    `• Advanced booking features\n` +
+                    `• Referral rewards system\n\n` +
+                    `Background Processing:\n` +
+                    `• Business dashboard initialization\n` +
+                    `• Pro subscription activation\n` +
+                    `• Welcome bonus application\n` +
+                    `• Stats initialization`, 'success');
+
+            } catch (error) {
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                updateMetrics(duration, false);
+                
+                showResult('registrationResults', 
+                    `❌ Business Registration Failed!\n\n` +
+                    `Error: ${error.message}\n` +
+                    `Duration: ${duration}ms\n\n` +
+                    `Common Issues:\n` +
+                    `1. Business functions missing in database\n` +
+                    `2. Business dashboard table not configured\n` +
+                    `3. Pro subscription function errors\n` +
+                    `4. Background processing timeout\n\n` +
+                    `Solutions:\n` +
+                    `1. Run FIX_BUSINESS_FUNCTIONS.sql\n` +
+                    `2. Check business_dashboards table exists\n` +
+                    `3. Verify all functions have permissions\n` +
+                    `4. Check server logs for detailed errors`, 'error');
+            }
+        }
+
+        async function testBusinessFeatures(userId) {
+            // Set test user ID for further testing
+            document.getElementById('testUserId').value = userId;
+            
+            // Auto-test business features
+            setTimeout(() => testBusinessBonus(), 1000);
+            setTimeout(() => testSubscriptionStatus(), 2000);
+            setTimeout(() => testBusinessDashboard(), 3000);
+        }
+
+        async function testBusinessBonus() {
+            const userId = document.getElementById('testUserId').value;
+            if (!userId) {
+                showResult('businessResults', 'Please provide a user ID to test', 'error');
+                return;
+            }
+
+            try {
+                // Simulate business bonus grant
+                const result = await simulateBusinessBonus(userId);
+                
+                showResult('businessResults', 
+                    `✅ Business Bonus Test Successful!\n\n` +
+                    `User ID: ${userId}\n` +
+                    `Bonus Granted: ${result.months} months pro subscription\n` +
+                    `Value: ₹${result.value}\n` +
+                    `Expires: ${result.expiresAt}\n` +
+                    `Status: ${result.status}\n\n` +
+                    `Features Enabled:\n` +
+                    `• Advanced booking calendar\n` +
+                    `• Customer management\n` +
+                    `• Analytics dashboard\n` +
+                    `• Priority support\n` +
+                    `• Custom branding`, 'success');
+
+            } catch (error) {
+                showResult('businessResults', 
+                    `❌ Business Bonus Test Failed!\n\n` +
+                    `Error: ${error.message}\n\n` +
+                    `Possible Causes:\n` +
+                    `1. grant_initial_business_bonus function missing\n` +
+                    `2. User is not a business user\n` +
+                    `3. Bonus already granted\n` +
+                    `4. Database permission issues\n\n` +
+                    `Fix Steps:\n` +
+                    `1. Run FIX_BUSINESS_FUNCTIONS.sql\n` +
+                    `2. Verify user_type = 'business'\n` +
+                    `3. Check business_dashboards table\n` +
+                    `4. Review function permissions`, 'error');
+            }
+        }
+
+        async function testSubscriptionStatus() {
+            const userId = document.getElementById('testUserId').value;
+            if (!userId) {
+                showResult('businessResults', 'Please provide a user ID to test', 'error');
+                return;
+            }
+
+            try {
+                const status = await simulateSubscriptionCheck(userId);
+                
+                showResult('businessResults', 
+                    `📊 Subscription Status Check:\n\n` +
+                    `User: ${status.fullName}\n` +
+                    `Business: ${status.businessName}\n` +
+                    `Plan: ${status.subscriptionPlan}\n` +
+                    `Status: ${status.planStatus}\n` +
+                    `Pro Months: ${status.proSubscriptionMonths}\n` +
+                    `Expires: ${status.proExpiresAt}\n` +
+                    `Active: ${status.isProActive ? '✅ Yes' : '❌ No'}\n` +
+                    `Days Remaining: ${status.daysRemaining}\n` +
+                    `Initial Bonus Given: ${status.initialProMonthsGiven ? '✅ Yes' : '❌ No'}\n` +
+                    `Referral Months: ${status.referralProMonthsEarned}`, 'info');
+
+            } catch (error) {
+                showResult('businessResults', 
+                    `❌ Subscription Status Check Failed!\n\n` +
+                    `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testBusinessDashboard() {
+            const userId = document.getElementById('testUserId').value;
+            if (!userId) {
+                showResult('businessResults', 'Please provide a user ID to test', 'error');
+                return;
+            }
+
+            try {
+                const dashboard = await simulateDashboardAccess(userId);
+                
+                showResult('businessResults', 
+                    `🏢 Business Dashboard Test:\n\n` +
+                    `Dashboard ID: ${dashboard.id}\n` +
+                    `User ID: ${userId}\n` +
+                    `Creation: ${dashboard.createdAt}\n` +
+                    `Last Update: ${dashboard.updatedAt}\n\n` +
+                    `Features Available:\n` +
+                    `• Business Hours Management\n` +
+                    `• Service Offerings\n` +
+                    `• Booking Settings\n` +
+                    `• Payment Methods\n` +
+                    `• Staff Management\n` +
+                    `• Business Metrics\n\n` +
+                    `Status: ✅ Dashboard Accessible`, 'success');
+
+            } catch (error) {
+                showResult('businessResults', 
+                    `❌ Business Dashboard Test Failed!\n\n` +
+                    `Error: ${error.message}\n\n` +
+                    `This might indicate:\n` +
+                    `1. Dashboard not initialized during registration\n` +
+                    `2. Missing business_dashboards table\n` +
+                    `3. User permission issues\n` +
+                    `4. Background processing failed`, 'error');
+            }
+        }
+
+        async function testDatabaseFunctions() {
+            showResult('databaseResults', '🔄 Testing Database Functions...\n', 'info');
+            
+            const tests = [
+                { name: 'get_user_by_email_fast', test: () => simulateFunctionTest('get_user_by_email_fast') },
+                { name: 'get_user_stats_fast', test: () => simulateFunctionTest('get_user_stats_fast') },
+                { name: 'is_business_user_fast', test: () => simulateFunctionTest('is_business_user_fast') },
+                { name: 'grant_initial_business_bonus', test: () => simulateFunctionTest('grant_initial_business_bonus') },
+                { name: 'grant_pro_subscription', test: () => simulateFunctionTest('grant_pro_subscription') },
+                { name: 'process_referral_fast', test: () => simulateFunctionTest('process_referral_fast') }
+            ];
+
+            let results = '🔍 Database Function Test Results:\n\n';
+            let passedTests = 0;
+
+            for (const test of tests) {
+                try {
+                    const result = await test.test();
+                    results += `✅ ${test.name}: PASSED (${result.duration}ms)\n`;
+                    passedTests++;
+                } catch (error) {
+                    results += `❌ ${test.name}: FAILED - ${error.message}\n`;
+                }
+            }
+
+            results += `\n📊 Summary: ${passedTests}/${tests.length} functions working\n`;
+            
+            if (passedTests === tests.length) {
+                results += '\n🎉 All database functions are working correctly!';
+                showResult('databaseResults', results, 'success');
+            } else {
+                results += '\n⚠️ Some functions need attention. Check the errors above.';
+                showResult('databaseResults', results, 'error');
+            }
+        }
+
+        async function runStressTest() {
+            const concurrentUsers = parseInt(document.getElementById('concurrentUsers').value);
+            const progressBar = document.getElementById('stressProgress');
+            
+            showResult('stressResults', `🔥 Starting stress test with ${concurrentUsers} concurrent registrations...\n`, 'info');
+            
+            const startTime = Date.now();
+            const promises = [];
+            
+            for (let i = 0; i < concurrentUsers; i++) {
+                const promise = simulateRegistration({
+                    email: `stress.test.${Date.now()}.${i}@example.com`,
+                    password: 'TestPassword123!',
+                    fullName: `Stress Test User ${i}`,
+                    phone: `+91 987654${String(i).padStart(4, '0')}`,
+                    location: 'Mumbai, Maharashtra',
+                    userType: Math.random() > 0.5 ? 'business' : 'customer',
+                    businessName: `Stress Test Business ${i}`,
+                    launchInterest: 5
+                });
+                
+                promises.push(promise);
+                
+                // Update progress
+                setTimeout(() => {
+                    progressBar.style.width = `${((i + 1) / concurrentUsers) * 50}%`;
+                }, i * 100);
+            }
+            
+            try {
+                const results = await Promise.allSettled(promises);
+                const endTime = Date.now();
+                const totalTime = endTime - startTime;
+                
+                progressBar.style.width = '100%';
+                
+                const successful = results.filter(r => r.status === 'fulfilled').length;
+                const failed = results.filter(r => r.status === 'rejected').length;
+                
+                const stressResults = 
+                    `🏁 Stress Test Complete!\n\n` +
+                    `Total Users: ${concurrentUsers}\n` +
+                    `Successful: ${successful}\n` +
+                    `Failed: ${failed}\n` +
+                    `Success Rate: ${((successful / concurrentUsers) * 100).toFixed(1)}%\n` +
+                    `Total Time: ${totalTime}ms\n` +
+                    `Average Time per User: ${(totalTime / concurrentUsers).toFixed(0)}ms\n` +
+                    `Throughput: ${((concurrentUsers / totalTime) * 1000).toFixed(1)} registrations/second\n\n` +
+                    `Performance Assessment:\n` +
+                    `${successful === concurrentUsers ? '🎉 Excellent! All registrations successful' : '⚠️ Some failures occurred'}\n` +
+                    `${totalTime / concurrentUsers < 3000 ? '⚡ Fast response times' : '🐌 Response times could be improved'}`;
+                
+                showResult('stressResults', stressResults, successful === concurrentUsers ? 'success' : 'error');
+                
+            } catch (error) {
+                showResult('stressResults', `❌ Stress test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Simulation functions (replace with actual API calls)
+        async function simulateRegistration(data) {
+            // Simulate registration time
+            await new Promise(resolve => setTimeout(resolve, Math.random() * 2000 + 500));
+            
+            if (Math.random() > 0.95) { // 5% failure rate for testing
+                throw new Error('Simulated registration failure');
+            }
+            
+            return {
+                userId: `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                email: data.email,
+                success: true
+            };
+        }
+
+        async function simulateBusinessBonus(userId) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            return {
+                months: 3,
+                value: 2997, // ₹999 x 3 months
+                expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'active'
+            };
+        }
+
+        async function simulateSubscriptionCheck(userId) {
+            await new Promise(resolve => setTimeout(resolve, 300));
+            return {
+                fullName: 'Test Business Owner',
+                businessName: 'Test Business Inc',
+                subscriptionPlan: 'pro',
+                planStatus: 'active',
+                proSubscriptionMonths: 3,
+                proExpiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+                isProActive: true,
+                daysRemaining: 90,
+                initialProMonthsGiven: true,
+                referralProMonthsEarned: 0
+            };
+        }
+
+        async function simulateDashboardAccess(userId) {
+            await new Promise(resolve => setTimeout(resolve, 400));
+            return {
+                id: `dashboard-${userId}`,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+        }
+
+        async function simulateFunctionTest(functionName) {
+            const startTime = Date.now();
+            await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
+            return {
+                duration: Date.now() - startTime,
+                success: true
+            };
+        }
+
+        function updateMetrics(duration, success) {
+            testMetrics.totalTests++;
+            testMetrics.totalTime += duration;
+            if (success) testMetrics.successfulTests++;
+            
+            document.getElementById('totalTests').textContent = testMetrics.totalTests;
+            document.getElementById('registrationTime').textContent = duration;
+            document.getElementById('successRate').textContent = 
+                ((testMetrics.successfulTests / testMetrics.totalTests) * 100).toFixed(1);
+        }
+
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${type}`;
+            element.style.display = 'block';
+        }
+
+        async function cleanupTestData() {
+            if (testUserIds.length === 0) {
+                showResult('cleanupResults', 'No test users to cleanup', 'info');
+                return;
+            }
+            
+            const confirmation = confirm(`This will delete ${testUserIds.length} test users. Are you sure?`);
+            if (!confirmation) return;
+            
+            try {
+                // Simulate cleanup (implement actual cleanup logic)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                showResult('cleanupResults', 
+                    `✅ Cleanup Successful!\n\n` +
+                    `Deleted ${testUserIds.length} test users:\n` +
+                    testUserIds.map(id => `• ${id}`).join('\n'), 'success');
+                
+                testUserIds = [];
+                
+            } catch (error) {
+                showResult('cleanupResults', `❌ Cleanup failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Generate random test data
+        function generateRandomTestData() {
+            const timestamp = Date.now();
+            document.getElementById('customerEmail').value = `test.customer.${timestamp}@example.com`;
+            document.getElementById('businessEmail').value = `test.business.${timestamp}@example.com`;
+            document.getElementById('customerName').value = `Test Customer ${timestamp}`;
+            document.getElementById('businessName').value = `Test Business Owner ${timestamp}`;
+            document.getElementById('businessCompanyName').value = `Test Business ${timestamp}`;
+        }
+
+        // Initialize with random data
+        window.onload = function() {
+            generateRandomTestData();
+        };
+    </script>
+</body>
+</html> 

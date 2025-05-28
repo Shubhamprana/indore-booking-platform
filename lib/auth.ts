@@ -1,0 +1,363 @@
+import {
+  supabase,
+  createUser,
+  getUserByEmail,
+  getUserByReferralCode,
+  createUserActivity,
+  initializeUserStats,
+  calculateAndUpdateUserStats
+} from "./supabase"
+import { processReferral } from "./user-stats"
+import { 
+  grantInitialBusinessBonus, 
+  processBusinessReferral, 
+  isBusinessUser,
+  initializeBusinessDashboard 
+} from "./business-subscription"
+
+export interface LoginCredentials {
+  email: string
+  password: string
+}
+
+export interface RegisterData {
+  email: string
+  password: string
+  fullName: string
+  phone: string
+  location: string
+  userType: "customer" | "business"
+  referralCode?: string
+  serviceInterests?: string[]
+  businessName?: string
+  businessCategory?: string
+  businessDescription?: string
+  currentBookingMethod?: string
+  launchInterest?: number
+  marketingConsent?: boolean
+  whatsappUpdates?: boolean
+  earlyAccessInterest?: boolean
+  shareOnSocial?: boolean
+}
+
+export interface LoginData {
+  email: string
+  password: string
+}
+
+export const login = async (loginData: LoginData) => {
+  try {
+    // Validate input
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(loginData.email)) {
+      throw new Error("Please enter a valid email address")
+    }
+    if (!loginData.password) {
+      throw new Error("Password is required")
+    }
+
+    // Sign in with Supabase
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: loginData.email.toLowerCase(),
+      password: loginData.password,
+    })
+
+    if (error) {
+      if (error.message.includes("Invalid login credentials")) {
+        throw new Error("Invalid email or password")
+      }
+      throw new Error(`Login failed: ${error.message}`)
+    }
+
+    if (!data.user) {
+      throw new Error("Login failed")
+    }
+
+    // Get user profile efficiently with minimal data
+    const { data: profile, error: profileError } = await supabase
+      .from("users")
+      .select("id, email, full_name, user_type, business_name")
+      .eq("email", loginData.email.toLowerCase())
+      .single()
+
+    if (profileError) {
+      throw new Error(`Profile lookup failed: ${profileError.message}`)
+    }
+
+    return {
+      user: data.user,
+      profile,
+      message: "Login successful!",
+    }
+  } catch (error) {
+    console.error("Login error:", error)
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Login failed. Please try again.")
+  }
+}
+
+export const register = async (registerData: RegisterData) => {
+  try {
+    // Validate input
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(registerData.email)) {
+      throw new Error("Please enter a valid email address")
+    }
+    if (registerData.password.length < 6) {
+      throw new Error("Password must be at least 6 characters long")
+    }
+    if (!registerData.fullName.trim()) {
+      throw new Error("Full name is required")
+    }
+    if (!registerData.phone?.trim()) {
+      throw new Error("Phone number is required")
+    }
+    if (!registerData.location) {
+      throw new Error("Location is required")
+    }
+
+    // Quick email existence check with minimal data
+    const { data: existingUser } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", registerData.email.toLowerCase())
+      .maybeSingle()
+
+    if (existingUser) {
+      throw new Error("An account with this email already exists")
+    }
+
+    // Create Supabase auth user
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: registerData.email.toLowerCase(),
+      password: registerData.password,
+    })
+
+    if (authError) {
+      throw new Error(`Registration failed: ${authError.message}`)
+    }
+    if (!authData.user) {
+      throw new Error("Failed to create user account")
+    }
+
+    // Create user profile (critical path)
+    const userProfile = await createUser({
+      id: authData.user.id,
+      email: registerData.email.toLowerCase(),
+      full_name: registerData.fullName,
+      phone: registerData.phone,
+      location: registerData.location,
+      user_type: registerData.userType,
+      referral_code: generateReferralCode(),
+      service_interests: registerData.serviceInterests || [],
+      business_name: registerData.businessName,
+      business_category: registerData.businessCategory,
+      business_description: registerData.businessDescription,
+      current_booking_method: registerData.currentBookingMethod,
+      launch_interest: registerData.launchInterest || 5,
+      marketing_consent: registerData.marketingConsent || false,
+      whatsapp_updates: registerData.whatsappUpdates || false,
+      early_access_interest: registerData.earlyAccessInterest || false,
+      share_on_social: registerData.shareOnSocial || false,
+      email_verified: false,
+    })
+
+    // Process heavy operations in background (non-blocking)
+    const processBackgroundTasks = async () => {
+      try {
+    // Initialize user stats
+        await initializeUserStats(userProfile.id).catch(error => {
+          console.error("Background: Stats initialization error:", error)
+        })
+
+        // Handle business operations
+        if (registerData.userType === "business") {
+          await Promise.allSettled([
+            initializeBusinessDashboard(userProfile.id),
+            grantInitialBusinessBonus(userProfile.id)
+          ])
+    }
+
+    // Create registration activity
+        const activityDescription = registerData.userType === "business" 
+          ? "Successfully registered as a business partner! Welcome bonus: 3 months pro subscription! 🎉"
+          : "Successfully registered for BookNow pre-launch"
+        
+      await createUserActivity(
+        userProfile.id, 
+        "registration", 
+          activityDescription, 
+        0, 
+        {
+          user_type: registerData.userType,
+          registration_source: "web",
+          launch_interest: registerData.launchInterest,
+            initial_bonus: registerData.userType === "business" ? "3_months_pro" : "none"
+        }
+        ).catch(error => {
+          console.error("Background: Registration activity error:", error)
+        })
+
+        // Handle referral processing
+    if (registerData.referralCode) {
+          try {
+            const referrer = await getUserByReferralCode(registerData.referralCode)
+            if (referrer) {
+              const referrerIsBusiness = await isBusinessUser(referrer.id)
+              const referredIsBusiness = registerData.userType === "business"
+              
+              if (referrerIsBusiness && referredIsBusiness) {
+                await processBusinessReferral(referrer.id, userProfile.id, registerData.referralCode)
+              } else {
+                await processReferral(referrer.id, userProfile.id, registerData.referralCode)
+            }
+            }
+          } catch (referralError) {
+            console.error("Background: Referral processing error:", referralError)
+            
+            if (referralError instanceof Error && referralError.message?.includes("No user found with referral code")) {
+              await createUserActivity(
+                userProfile.id, 
+                "notification", 
+                `Invalid referral code '${registerData.referralCode}' was entered during registration`, 
+                0, 
+                { 
+                  referral_code: registerData.referralCode, 
+                  error_type: "invalid_code",
+                  message: "The referral code you entered doesn't exist. You can still earn rewards by referring others!"
+                }
+              ).catch(notificationError => {
+                console.error("Background: Failed to create notification activity:", notificationError)
+              })
+            }
+          }
+        }
+      } catch (backgroundError) {
+        console.error("Background processing error:", backgroundError)
+        // Don't throw - this shouldn't affect registration success
+      }
+    }
+
+    // Start background processing without waiting
+    processBackgroundTasks()
+
+    return {
+      user: authData.user,
+      profile: userProfile,
+      message: "Registration successful! Please check your email to verify your account.",
+    }
+  } catch (error) {
+    console.error("Registration error:", error)
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Registration failed. Please try again.")
+  }
+}
+
+export const logout = async () => {
+  try {
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      throw new Error(`Logout failed: ${error.message}`)
+    }
+    return { message: "Logged out successfully" }
+  } catch (error) {
+    console.error("Logout error:", error)
+    throw new Error("Logout failed. Please try again.")
+  }
+}
+
+// Cache for current user data
+let currentUserCache: { user: any, profile: any, timestamp: number } | null = null
+const CURRENT_USER_CACHE_DURATION = 30000 // 30 seconds
+
+export const getCurrentUser = async () => {
+  try {
+    // Check cache first
+    if (currentUserCache && (Date.now() - currentUserCache.timestamp) < CURRENT_USER_CACHE_DURATION) {
+      return currentUserCache
+    }
+
+    const { data: { user }, error } = await supabase.auth.getUser()
+    
+    if (error) {
+      throw new Error(`Failed to get current user: ${error.message}`)
+    }
+    if (!user) {
+      currentUserCache = null
+      return null
+    }
+
+    // Get minimal profile data efficiently
+    const { data: profile, error: profileError } = await supabase
+      .from("users")
+      .select("id, email, full_name, user_type, business_name, referral_code")
+      .eq("email", user.email!)
+      .single()
+
+    if (profileError) {
+      console.error("Profile fetch error:", profileError)
+      currentUserCache = null
+      return null
+    }
+
+    const result = { user, profile }
+    
+    // Cache the result
+    currentUserCache = {
+      ...result,
+      timestamp: Date.now()
+    }
+
+    return result
+  } catch (error) {
+    console.error("Get current user error:", error)
+    currentUserCache = null
+    return null
+  }
+}
+
+export const resetPassword = async (email: string) => {
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+
+    if (error) {
+      throw new Error(`Password reset failed: ${error.message}`)
+    }
+    return { message: "Password reset email sent!" }
+  } catch (error) {
+    console.error("Reset password error:", error)
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Password reset failed. Please try again.")
+  }
+}
+
+export const updateUserProfile = async (userId: string, profileData: any) => {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .update(profileData)
+      .eq("id", userId)
+      .select()
+      .single()
+
+    if (error) {
+      throw new Error(`Failed to update user: ${error.message}`)
+    }
+    return data
+  } catch (error) {
+    console.error("Error updating user profile:", error)
+    throw error
+  }
+}
+
+export const generateReferralCode = (): string => {
+  return `BN${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+}
