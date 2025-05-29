@@ -3,9 +3,11 @@ const nextConfig = {
   // External packages for server components
   serverExternalPackages: ['@supabase/supabase-js'],
   
-  // Experimental features
+  // Experimental features for better performance
   experimental: {
     scrollRestoration: true,
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    webVitalsAttribution: ['CLS', 'LCP'],
   },
 
   // Performance optimizations
@@ -24,11 +26,27 @@ const nextConfig = {
         sideEffects: false,
         usedExports: true,
         minimize: true,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+              priority: 10,
+            },
+            common: {
+              minChunks: 2,
+              chunks: 'all',
+              priority: 5,
+            },
+          },
+        },
       }
     }
 
-    // Bundle analyzer (only in development)
-    if (dev && process.env.ANALYZE === 'true') {
+    // Bundle analyzer
+    if (process.env.ANALYZE === 'true') {
       const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
       config.plugins.push(
         new BundleAnalyzerPlugin({
@@ -44,13 +62,12 @@ const nextConfig = {
   // Image optimization
   images: {
     formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
     minimumCacheTTL: 31536000, // 1 year
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     domains: ['localhost'],
-    // Add your image domains here
     remotePatterns: [
       {
         protocol: 'https',
@@ -59,7 +76,7 @@ const nextConfig = {
     ],
   },
 
-  // Security headers
+  // Security and performance headers
   async headers() {
     return [
       {
@@ -114,6 +131,16 @@ const nextConfig = {
             value: 'public, max-age=31536000, immutable'
           }
         ]
+      },
+      // API cache headers
+      {
+        source: '/api/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=43200'
+          }
+        ]
       }
     ]
   },
@@ -121,19 +148,11 @@ const nextConfig = {
   // Redirects for SEO
   async redirects() {
     return [
-      // Add any necessary redirects here
       {
         source: '/home',
         destination: '/',
         permanent: true,
       },
-    ]
-  },
-
-  // Rewrites for API routes or proxy
-  async rewrites() {
-    return [
-      // Add any necessary rewrites here
     ]
   },
 
@@ -143,17 +162,15 @@ const nextConfig = {
     NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
   },
 
-  // Output configuration
+  // Output configuration for production
   output: 'standalone',
   
-  // Compression
+  // Compression and optimization
   compress: true,
-
-  // Power-ups for production
   poweredByHeader: false,
   reactStrictMode: true,
 
-  // Monitoring
+  // Monitoring and performance
   onDemandEntries: {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
@@ -161,19 +178,26 @@ const nextConfig = {
 
   // TypeScript configuration
   typescript: {
-    // Only run type checking in development
     ignoreBuildErrors: false,
   },
 
   // ESLint configuration
   eslint: {
-    // Only run ESLint in development
     ignoreDuringBuilds: false,
     dirs: ['pages', 'app', 'components', 'lib', 'hooks']
   },
 
-  // Custom configuration for robots.txt generation
-  // Note: robots.txt should be created in the public folder
+  // Generate static exports for better performance
+  trailingSlash: false,
+  generateEtags: true,
+  
+  // Additional performance optimizations
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
+      skipDefaultConversion: true,
+    },
+  },
 }
 
 module.exports = nextConfig 

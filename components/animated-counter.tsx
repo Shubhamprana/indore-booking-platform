@@ -1,44 +1,92 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, memo } from "react"
 
 interface AnimatedCounterProps {
   end: number
   duration?: number
   suffix?: string
+  start?: number
 }
 
-export function AnimatedCounter({ end, duration = 2000, suffix = "" }: AnimatedCounterProps) {
-  const [count, setCount] = useState(0)
+const AnimatedCounter = memo(function AnimatedCounter({ 
+  end, 
+  duration = 2000, 
+  suffix = "", 
+  start = 0 
+}: AnimatedCounterProps) {
+  const [count, setCount] = useState(start)
+  const [isVisible, setIsVisible] = useState(false)
+  const elementRef = useRef<HTMLSpanElement>(null)
+  const animationRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
-    let startTime: number
-    let animationFrame: number
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.1 }
+    )
 
-    const animate = (currentTime: number) => {
-      if (!startTime) startTime = currentTime
-      const progress = Math.min((currentTime - startTime) / duration, 1)
+    if (elementRef.current) {
+      observer.observe(elementRef.current)
+    }
 
-      setCount(Math.floor(progress * end))
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!isVisible) return
+
+    const startTime = Date.now()
+    const startValue = count
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      
+      // Smooth easing function
+      const easeOut = 1 - Math.pow(1 - progress, 3)
+      const newCount = Math.floor(easeOut * (end - startValue) + startValue)
+      
+      setCount(newCount)
 
       if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate)
+        animationRef.current = requestAnimationFrame(animate)
       }
     }
 
-    animationFrame = requestAnimationFrame(animate)
+    animationRef.current = requestAnimationFrame(animate)
 
     return () => {
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame)
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [end, duration])
+  }, [isVisible, end, duration, count])
+
+  // Format numbers efficiently
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M'
+    }
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K'
+    }
+    return num.toLocaleString()
+  }
 
   return (
-    <span>
-      {count.toLocaleString()}
-      {suffix}
+    <span ref={elementRef} className="tabular-nums font-bold">
+      {formatNumber(count)}{suffix}
     </span>
   )
-}
+})
+
+// Export both named and default for compatibility
+export { AnimatedCounter }
+export default AnimatedCounter
+

@@ -1,285 +1,149 @@
-# BookNow - Pre-Launch Booking Platform
+# BookNow Platform
 
-A modern, optimized booking platform with a comprehensive referral system and milestone-based rewards.
+> Skip the Wait, Book Instantly
+
+A modern booking platform built with Next.js 15, Supabase, and TypeScript. BookNow allows users to discover businesses, follow their favorites, and stay updated with real-time notifications.
 
 ## 🚀 Features
 
-- **Lightning-fast registration** (< 2 seconds)
-- **Recurring milestone referral system** (rewards every 2 referrals)
-- **Real-time stats tracking** with caching
-- **Comprehensive user profiles**
-- **Background processing** for optimal performance
-- **Mobile-responsive design**
+- **User Authentication**: Secure login/register with Supabase Auth
+- **Business Discovery**: Search and explore local businesses
+- **Follow System**: Follow your favorite businesses for updates
+- **Real-time Updates**: Live notifications and activity feeds
+- **Responsive Design**: Modern UI with Tailwind CSS and Radix UI
+- **Performance Optimized**: Built for speed and scalability
 
-## 📊 System Architecture
+## 🛠️ Tech Stack
 
-### Core Components
+- **Framework**: Next.js 15 with App Router
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Styling**: Tailwind CSS + Radix UI
+- **Language**: TypeScript
+- **Deployment**: Vercel
 
-1. **Authentication System** (`lib/auth.ts`)
-   - Optimized registration flow
-   - Background referral processing
-   - Comprehensive error handling
+## 📋 Prerequisites
 
-2. **User Statistics** (`lib/user-stats.ts`)
-   - Cached stats with 30-second TTL
-   - Milestone-based referral rewards
-   - Performance-optimized queries
+- Node.js 18+ 
+- npm or yarn
+- Supabase account
+- Vercel account (for deployment)
 
-3. **Database Layer** (`lib/supabase.ts`)
-   - Streamlined database operations
-   - Concurrent operation prevention
-   - Efficient data fetching
+## 🔧 Installation
 
-### Database Schema
-
-- **users**: User profiles and account information
-- **user_stats**: Aggregated user statistics
-- **referrals**: Referral relationships and tracking
-- **user_activities**: Activity log and rewards
-- **achievements**: User achievements and badges
-
-## 🎯 Referral System
-
-### Milestone-Based Rewards
-
-The system uses a recurring milestone approach:
-
-- **Every 2 referrals** = New milestone
-- **Referrer reward**: 50 credits per milestone
-- **Referred users reward**: 25 points each (for the 2 most recent)
-- **Unlimited milestones**: Users can continue earning indefinitely
-
-### Example Flow
-
-1. User A refers User B → Progress: 1/2
-2. User A refers User C → **Milestone 1 reached!**
-   - User A gets 50 credits
-   - User B gets 25 points
-   - User C gets 25 points
-3. User A refers User D → Progress: 1/2 (towards Milestone 2)
-4. User A refers User E → **Milestone 2 reached!**
-   - User A gets another 50 credits
-   - User D gets 25 points
-   - User E gets 25 points
-
-## ⚡ Performance Optimizations
-
-### Registration Flow
-- **Core operations**: 500ms - 1 second
-- **Background processing**: 2-5 seconds (invisible to user)
-- **No timeouts**: Registration never waits for background tasks
-
-### Caching Strategy
-- **User stats**: 30-second cache
-- **Concurrent protection**: Prevents race conditions
-- **Staggered updates**: Prevents database lock contention
-
-### Database Optimizations
-- **Parallel queries**: Multiple operations run concurrently
-- **Indexed columns**: Fast lookups on email, referral codes
-- **Efficient joins**: Optimized relationship queries
-
-## 🛠️ Setup Instructions
-
-### 1. Database Setup
-
-Run the complete setup SQL:
-
-```sql
--- Execute COMPLETE_SETUP.sql in your Supabase dashboard
--- This creates all tables, indexes, and permissions
+1. **Clone the repository**
+```bash
+git clone <your-repo-url>
+cd booknow-platform
 ```
 
-### 2. Environment Variables
-
-Create a `.env.local` file:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-### 3. Install Dependencies
-
+2. **Install dependencies**
 ```bash
 npm install
 ```
 
-### 4. Run Development Server
+3. **Set up environment variables**
+```bash
+cp .env.example .env.local
+```
 
+Fill in your Supabase credentials and other configuration variables.
+
+4. **Run the development server**
 ```bash
 npm run dev
 ```
 
-## 🧪 Testing
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Comprehensive Test Suite
+## 🌐 Environment Variables
 
-Open `test-system.html` in your browser for:
+Required environment variables for deployment:
 
-- **System Health Checks**: Database connectivity and performance
-- **Registration Testing**: End-to-end registration flow
-- **Referral System Testing**: Milestone logic and code validation
-- **Performance Testing**: Query speed and concurrent operations
-- **User Stats Testing**: Stats accuracy and performance
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-### Test Categories
+# Application Configuration
+NEXT_PUBLIC_APP_URL=https://your-domain.com
+NEXT_PUBLIC_APP_NAME=BookNow
+NEXT_PUBLIC_APP_DESCRIPTION=Skip the Wait, Book Instantly
 
-1. **System Health** 🏥
-   - Database table connectivity
-   - Response time monitoring
-   - System status overview
+# Security
+NEXTAUTH_SECRET=your_secure_secret_key
+NEXTAUTH_URL=https://your-domain.com
+```
 
-2. **Registration Flow** 📝
-   - User creation simulation
-   - Referral code validation
-   - Performance measurement
+## 🚀 Deployment
 
-3. **Referral System** 🎯
-   - Code lookup testing
-   - Milestone logic validation
-   - Reward distribution testing
+### Deploy to Vercel
 
-4. **User Statistics** 📊
-   - Stats query performance
-   - Data accuracy verification
-   - Cache effectiveness
+1. **Using Vercel CLI**:
+```bash
+npm i -g vercel
+vercel login
+vercel
+```
+
+2. **Using GitHub Integration**:
+   - Push your code to GitHub
+   - Connect your repository to Vercel
+   - Configure environment variables
+   - Deploy automatically
+
+### Build Locally
+
+```bash
+npm run build
+npm start
+```
 
 ## 📁 Project Structure
 
 ```
-├── app/                    # Next.js app directory
-│   ├── login/             # Login page
-│   ├── register/          # Registration flow
-│   ├── profile/           # User profile
+booknow-platform/
+├── app/                    # Next.js 15 App Router
+│   ├── api/               # API routes
+│   ├── auth/              # Authentication pages
+│   ├── business/          # Business-related pages
+│   ├── profile/           # User profile pages
 │   └── ...
-├── lib/                   # Core libraries
-│   ├── auth.ts           # Authentication logic
-│   ├── supabase.ts       # Database operations
-│   └── user-stats.ts     # Statistics and referrals
-├── components/           # Reusable UI components
-├── hooks/               # Custom React hooks
-├── styles/              # Global styles
-├── public/              # Static assets
-├── COMPLETE_SETUP.sql   # Database setup
-├── test-system.html     # Comprehensive test suite
-└── README.md           # This file
+├── components/            # Reusable UI components
+├── hooks/                 # Custom React hooks
+├── lib/                   # Utility functions and configurations
+├── public/                # Static assets
+├── styles/                # Global styles
+└── ...
 ```
 
-## 🔧 Configuration
+## 🔨 Available Scripts
 
-### Reward Amounts
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run lint:fix` - Fix ESLint errors
+- `npm run type-check` - Run TypeScript checks
+- `npm run clean` - Clean build directories
 
-Current reward configuration:
+## 🤝 Contributing
 
-```typescript
-// Registration
-const REGISTRATION_POINTS = 0
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
 
-// Referral Milestones (every 2 referrals)
-const REFERRER_CREDITS = 50
-const REFERRED_USER_POINTS = 25
-```
+## 📄 License
 
-### Cache Settings
+This project is private and proprietary.
 
-```typescript
-// Stats cache duration
-const CACHE_DURATION = 30000 // 30 seconds
+## 🆘 Support
 
-// Background processing delay
-const REFERRAL_PROCESSING_DELAY = 1000 // 1 second
-```
-
-## 📈 Monitoring
-
-### Key Metrics
-
-- **Registration completion time**: < 2 seconds
-- **Database query performance**: < 200ms average
-- **Cache hit rate**: > 80%
-- **Background processing time**: 2-5 seconds
-
-### Performance Indicators
-
-- 🟢 **Excellent**: < 100ms query time
-- 🟡 **Good**: 100-300ms query time
-- 🔴 **Needs optimization**: > 300ms query time
-
-## 🚀 Deployment
-
-### Production Checklist
-
-1. **Enable RLS policies** in Supabase
-2. **Set up proper environment variables**
-3. **Configure domain and SSL**
-4. **Set up monitoring and logging**
-5. **Test all flows end-to-end**
-
-### Environment-Specific Settings
-
-```typescript
-// Development
-const isDevelopment = process.env.NODE_ENV === 'development'
-
-// Production optimizations
-if (!isDevelopment) {
-  // Enable RLS
-  // Reduce logging
-  // Enable caching
-}
-```
-
-## 🔒 Security
-
-### Current Security Measures
-
-- **RLS disabled** for development (enable in production)
-- **Input validation** on all forms
-- **SQL injection protection** via Supabase
-- **Authentication required** for sensitive operations
-
-### Production Security
-
-1. Enable Row Level Security (RLS)
-2. Set up proper user roles
-3. Implement rate limiting
-4. Add CSRF protection
-5. Enable audit logging
-
-## 📞 Support
-
-### Common Issues
-
-1. **Registration timeout**: Check database connectivity
-2. **Referral not working**: Verify referral code exists
-3. **Stats not updating**: Clear cache and recalculate
-4. **Performance issues**: Run performance tests
-
-### Debug Tools
-
-- **Test Suite**: `test-system.html`
-- **Browser Console**: Check for error logs
-- **Supabase Dashboard**: Monitor database queries
-- **Network Tab**: Check API response times
-
-## 🎉 Success Metrics
-
-### Before Optimization
-- ❌ Registration timeout: 15-30 seconds
-- ❌ User experience: Frustrating timeouts
-- ❌ Success rate: ~60% (due to timeouts)
-
-### After Optimization
-- ✅ Registration completion: 0.5-2 seconds
-- ✅ User experience: Lightning fast ⚡
-- ✅ Success rate: ~99% (only auth failures)
-- ✅ Background processing: 2-5 seconds (invisible)
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+For support and questions, please contact the development team.
 
 ---
 
-**Built with ❤️ for the future of booking** 
+**Built with ❤️ using Next.js and Supabase** 

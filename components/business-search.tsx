@@ -8,6 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/hooks/use-auth'
+import { ScalableCache, CacheStrategies } from '@/lib/scalable-cache'
+import { PerformanceTracker } from '@/lib/performance'
 import { 
   searchBusinessUsers, 
   followUser,
@@ -66,9 +68,23 @@ export function BusinessSearch({
   }, [mounted, showTrending])
 
   const loadTrendingUsers = async () => {
+    const startTime = Date.now()
+    
     try {
       setLoading(true)
-      const trending = await getTrendingBusinessUsers(profile?.id, 10)
+      
+      // Use scalable cache for trending users
+      const cacheConfig = CacheStrategies.businessSearch('trending', 'all')
+      
+      const trending = await ScalableCache.get(
+        cacheConfig.key,
+        async () => {
+          return await getTrendingBusinessUsers(profile?.id, 10)
+        },
+        cacheConfig.ttl,
+        cacheConfig.priority
+      )
+      
       setTrendingUsers(trending)
       
       // Update following state
@@ -77,8 +93,13 @@ export function BusinessSearch({
       )
       setFollowingUsers(following)
       setLastUpdateTime(Date.now())
+      
+      // Track performance
+      PerformanceTracker.trackAPICall('trending-users', Date.now() - startTime, true)
+      
     } catch (error) {
       console.error('Error loading trending users:', error)
+      PerformanceTracker.trackAPICall('trending-users', Date.now() - startTime, false)
     } finally {
       setLoading(false)
     }
@@ -87,13 +108,27 @@ export function BusinessSearch({
   const handleSearch = useCallback(async (query: string) => {
     if (!mounted) return
     
+    const startTime = Date.now()
+    
     try {
       setLoading(true)
-      const results = await searchBusinessUsers(
-        query.trim(), 
-        profile?.id, 
-        maxResults
+      
+      // Use scalable cache for search results
+      const cacheConfig = CacheStrategies.businessSearch(query.trim(), 'all')
+      
+      const results = await ScalableCache.get(
+        cacheConfig.key,
+        async () => {
+          return await searchBusinessUsers(
+            query.trim(), 
+            profile?.id, 
+            maxResults
+          )
+        },
+        cacheConfig.ttl,
+        cacheConfig.priority
       )
+      
       setSearchResults(results)
       
       // Update following state
@@ -102,8 +137,13 @@ export function BusinessSearch({
       )
       setFollowingUsers(following)
       setLastUpdateTime(Date.now())
+      
+      // Track performance
+      PerformanceTracker.trackAPICall('business-search', Date.now() - startTime, true)
+      
     } catch (error) {
       console.error('Error searching users:', error)
+      PerformanceTracker.trackAPICall('business-search', Date.now() - startTime, false)
       toast({
         title: "Search Error",
         description: "Failed to search business users. Please try again.",

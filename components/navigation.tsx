@@ -146,7 +146,7 @@ export function Navigation({
                 // Logged in user
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full text-foreground hover:bg-accent">
                       <Avatar className="h-10 w-10">
                         <AvatarImage 
                           src={profile.profile_image_url || "/placeholder.svg?height=40&width=40"} 
@@ -223,6 +223,7 @@ export function Navigation({
               <Button
                 variant="ghost"
                 size="sm"
+                className="text-foreground hover:bg-accent"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, Suspense, lazy } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -15,6 +15,12 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   TrendingUp,
   Users,
   Star,
@@ -22,7 +28,7 @@ import {
   ArrowRight,
   Globe,
   Calendar,
-  Gift,
+  Award,
   Menu,
   X,
   Phone,
@@ -37,25 +43,34 @@ import {
   Home,
   Rocket,
   Clock,
-  Share2,
   UserPlus,
   LogOut,
   User,
+  Zap,
+  Shield,
+  Heart,
+  Target,
+  Share2,
+  Copy,
+  Gift,
+  Twitter,
+  Facebook,
+  MessageCircle,
+  Linkedin,
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useAuth } from "@/hooks/use-auth"
+import { useToast } from "@/hooks/use-toast"
 
-// Fix lazy loading imports to handle named exports correctly
-const FloatingElements = lazy(() => import("@/components/floating-elements"))
-const AnimatedCounter = lazy(() => import("@/components/animated-counter"))
+// Import components normally to prevent loading issues
+import FloatingElements from "@/components/floating-elements"
+import AnimatedCounter from "@/components/animated-counter"
 
 // Import other components normally for now to prevent loading issues
 import { LocationSelector } from "@/components/location-selector"
 import { LaunchCountdown } from "@/components/launch-countdown"
-
-// Keep BusinessSearch as lazy since it's heavy and conditional
-const BusinessSearch = lazy(() => import("@/components/business-search"))
+import BusinessSearch from "@/components/business-search"
 
 // Loading fallbacks for lazy components
 const CounterFallback = () => (
@@ -71,20 +86,54 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [selectedLocation, setSelectedLocation] = useState("Select your city")
   const [email, setEmail] = useState("")
+  const [showReferralModal, setShowReferralModal] = useState(false)
+  const [referralCode] = useState(`BN${Math.random().toString(36).substring(2, 8).toUpperCase()}`)
   
-  // Get authentication state
+  // Get authentication state and toast
   const { profile, loading: authLoading, signOut } = useAuth()
+  const { toast } = useToast()
 
   // Optimized services data (reduced metadata)
   const services = [
-    { icon: Utensils, name: "Restaurants", count: "500+" },
-    { icon: Scissors, name: "Salons & Spas", count: "300+" },
-    { icon: Stethoscope, name: "Clinics", count: "200+" },
-    { icon: Building, name: "Hotels", count: "150+" },
-    { icon: Car, name: "Car Services", count: "100+" },
-    { icon: Dumbbell, name: "Fitness", count: "80+" },
-    { icon: GraduationCap, name: "Education", count: "120+" },
-    { icon: Home, name: "Home Services", count: "250+" },
+    { icon: Utensils, name: "Restaurants", count: "500+", gradient: "from-red-500 to-orange-500" },
+    { icon: Scissors, name: "Salons & Spas", count: "300+", gradient: "from-pink-500 to-purple-500" },
+    { icon: Stethoscope, name: "Clinics", count: "200+", gradient: "from-blue-500 to-cyan-500" },
+    { icon: Building, name: "Hotels", count: "150+", gradient: "from-indigo-500 to-purple-500" },
+    { icon: Car, name: "Car Services", count: "100+", gradient: "from-gray-600 to-gray-800" },
+    { icon: Dumbbell, name: "Fitness", count: "80+", gradient: "from-green-500 to-teal-500" },
+    { icon: GraduationCap, name: "Education", count: "120+", gradient: "from-yellow-500 to-orange-500" },
+    { icon: Home, name: "Home Services", count: "250+", gradient: "from-teal-500 to-green-500" },
+  ]
+
+  const features = [
+    {
+      icon: Zap,
+      title: "Instant Booking",
+      description: "Book appointments in seconds with real-time availability",
+      color: "text-yellow-600",
+      bg: "bg-yellow-50"
+    },
+    {
+      icon: Shield,
+      title: "Verified Providers",
+      description: "All service providers are thoroughly verified and rated",
+      color: "text-blue-600",
+      bg: "bg-blue-50"
+    },
+    {
+      icon: Heart,
+      title: "Quality Guaranteed",
+      description: "100% satisfaction guarantee with every booking",
+      color: "text-red-600",
+      bg: "bg-red-50"
+    },
+    {
+      icon: Target,
+      title: "Smart Matching",
+      description: "AI-powered recommendations based on your preferences",
+      color: "text-purple-600",
+      bg: "bg-purple-50"
+    }
   ]
 
   const content = {
@@ -111,11 +160,15 @@ export default function HomePage() {
         preRegistered: "Pre-registered Users",
         cities: "Cities Interested",
         businesses: "Businesses Waiting",
-        referrals: "Successful Referrals",
+        partnerships: "Strategic Partners",
       },
       services: {
         title: "All Services Coming Soon",
         subtitle: "Get ready for seamless booking across all these categories",
+      },
+      features: {
+        title: "Why Choose BookNow?",
+        subtitle: "Discover what makes us the future of service booking",
       },
       valueProps: {
         customers: {
@@ -157,17 +210,6 @@ export default function HomePage() {
           },
         ],
       },
-      referral: {
-        title: "Invite Friends & Earn Rewards",
-        subtitle: "Share the excitement and get amazing benefits",
-        benefits: [
-          "₹500 credit for every friend who joins",
-          "Unlock premium features early",
-          "Exclusive referrer badges",
-          "Special launch party invites",
-        ],
-        cta: "Start Referring Now",
-      },
     },
     hi: {
       nav: {
@@ -192,11 +234,15 @@ export default function HomePage() {
         preRegistered: "पूर्व-पंजीकृत उपयोगकर्ता",
         cities: "रुचि रखने वाले शहर",
         businesses: "प्रतीक्षारत व्यवसाय",
-        referrals: "सफल रेफरल",
+        partnerships: "रणनीतिक भागीदार",
       },
       services: {
         title: "सभी सेवाएं जल्द आ रही हैं",
         subtitle: "इन सभी श्रेणियों में निर्बाध बुकिंग के लिए तैयार हो जाइए",
+      },
+      features: {
+        title: "BookNow क्यों चुनें?",
+        subtitle: "जानें कि हम सेवा बुकिंग का भविष्य क्यों हैं",
       },
       valueProps: {
         customers: {
@@ -228,17 +274,6 @@ export default function HomePage() {
           },
         ],
       },
-      referral: {
-        title: "दोस्तों को आमंत्रित करें और पुरस्कार कमाएं",
-        subtitle: "उत्साह साझा करें और अद्भुत लाभ प्राप्त करें",
-        benefits: [
-          "हर दोस्त के शामिल होने पर ₹500 क्रेडिट",
-          "प्रीमियम फीचर्स जल्दी अनलॉक करें",
-          "विशेष रेफरर बैज",
-          "विशेष लॉन्च पार्टी के निमंत्रण",
-        ],
-        cta: "अभी रेफर करना शुरू करें",
-      },
     },
   }
 
@@ -252,11 +287,52 @@ export default function HomePage() {
     }
   }
 
+  const copyReferralCode = () => {
+    navigator.clipboard.writeText(referralCode)
+    toast({
+      title: "Copied!",
+      description: "Referral code copied to clipboard",
+    })
+  }
+
+  const shareOnSocial = (platform: string) => {
+    const message = `I just joined the BookNow pre-launch! 🚀 Skip the wait and book instantly when it launches. Join me with my referral code: ${referralCode}`
+    const url = `https://booknow.com/register?ref=${referralCode}`
+
+    let shareUrl = ""
+    switch (platform) {
+      case "twitter":
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}&url=${encodeURIComponent(url)}`
+        break
+      case "facebook":
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
+        break
+      case "whatsapp":
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(message + " " + url)}`
+        break
+      case "linkedin":
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
+        break
+    }
+
+    if (shareUrl) {
+      window.open(shareUrl, "_blank")
+    }
+  }
+
+  const handleReferNow = () => {
+    console.log('🔧 DEBUG: Refer Now button clicked', { profile, showReferralModal })
+    if (profile) {
+      setShowReferralModal(true)
+    } else {
+      // Redirect to registration
+      window.location.href = "/register"
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
-      <Suspense fallback={<ComponentFallback />}>
-        <FloatingElements />
-      </Suspense>
+      <FloatingElements />
 
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
@@ -286,13 +362,22 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <LocationSelector selectedLocation={selectedLocation} onLocationChange={setSelectedLocation} />
+              <LocationSelector 
+                selectedLocation={selectedLocation} 
+                onLocationChange={(location) => {
+                  console.log('🔧 DEBUG: Location changed to:', location)
+                  setSelectedLocation(location)
+                }} 
+              />
 
               {/* Language Toggle - Always visible */}
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setLanguage(language === "en" ? "hi" : "en")}
+                onClick={() => {
+                  console.log('🔧 DEBUG: Language button clicked, current:', language)
+                  setLanguage(language === "en" ? "hi" : "en")
+                }}
                 className="flex items-center space-x-1"
               >
                 <Globe className="w-4 h-4" />
@@ -379,7 +464,10 @@ export default function HomePage() {
                 variant="outline"
                 size="sm"
                 className="md:hidden"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                onClick={() => {
+                  console.log('🔧 DEBUG: Mobile menu button clicked, current state:', mobileMenuOpen)
+                  setMobileMenuOpen(!mobileMenuOpen)
+                }}
               >
                 {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
               </Button>
@@ -523,10 +611,19 @@ export default function HomePage() {
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
-                <Link href="/referral">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-lg px-8 py-6 w-full sm:w-auto border-2 border-green-500 text-green-600 hover:bg-green-50"
+                  onClick={handleReferNow}
+                >
+                  <Share2 className="mr-2 w-5 h-5" />
+                  Refer & Earn
+                </Button>
+                <Link href="/about">
                   <Button variant="outline" size="lg" className="text-lg px-8 py-6 w-full sm:w-auto">
-                    <Share2 className="mr-2 w-5 h-5" />
-                    Refer & Earn
+                    <Award className="mr-2 w-5 h-5" />
+                    Learn More
                   </Button>
                 </Link>
               </div>
@@ -563,36 +660,56 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-3xl md:text-4xl font-bold mb-2">
-                <Suspense fallback={<CounterFallback />}>
-                  <AnimatedCounter end={15000} suffix="+" />
-                </Suspense>
+                <AnimatedCounter end={15000} suffix="+" />
               </div>
               <div className="text-blue-100">{t.stats.preRegistered}</div>
             </div>
             <div>
               <div className="text-3xl md:text-4xl font-bold mb-2">
-                <Suspense fallback={<CounterFallback />}>
-                  <AnimatedCounter end={50} suffix="+" />
-                </Suspense>
+                <AnimatedCounter end={50} suffix="+" />
               </div>
               <div className="text-blue-100">{t.stats.cities}</div>
             </div>
             <div>
               <div className="text-3xl md:text-4xl font-bold mb-2">
-                <Suspense fallback={<CounterFallback />}>
-                  <AnimatedCounter end={2000} suffix="+" />
-                </Suspense>
+                <AnimatedCounter end={2000} suffix="+" />
               </div>
               <div className="text-blue-100">{t.stats.businesses}</div>
             </div>
             <div>
               <div className="text-3xl md:text-4xl font-bold mb-2">
-                <Suspense fallback={<CounterFallback />}>
-                  <AnimatedCounter end={5000} suffix="+" />
-                </Suspense>
+                <AnimatedCounter end={25} suffix="+" />
               </div>
-              <div className="text-blue-100">{t.stats.referrals}</div>
+              <div className="text-blue-100">{t.stats.partnerships}</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{t.features.title}</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">{t.features.subtitle}</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <Card
+                key={index}
+                className="p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group border-2 hover:border-blue-200"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <CardContent className="p-0 text-center">
+                  <div className={`w-16 h-16 ${feature.bg} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}>
+                    <feature.icon className={`w-8 h-8 ${feature.color}`} />
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-3 text-lg">{feature.title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -609,19 +726,17 @@ export default function HomePage() {
                 Find and follow local businesses, connect with entrepreneurs, and build your network
               </p>
             </div>
-            <Suspense fallback={<ComponentFallback />}>
-              <BusinessSearch 
-                showTrending={true} 
-                maxResults={10} 
-                className="max-w-4xl mx-auto" 
-              />
-            </Suspense>
+            <BusinessSearch 
+              showTrending={true} 
+              maxResults={10} 
+              className="max-w-4xl mx-auto" 
+            />
           </div>
         </section>
       )}
 
       {/* Services Preview */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{t.services.title}</h2>
@@ -632,7 +747,7 @@ export default function HomePage() {
             {services.map((service, index) => (
               <Card
                 key={index}
-                className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-2 cursor-pointer group relative overflow-hidden"
+                className="p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group relative overflow-hidden bg-white"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="absolute top-2 right-2">
@@ -642,78 +757,15 @@ export default function HomePage() {
                 </div>
                 <CardContent className="p-0 text-center">
                   <div className="relative mb-4">
-                    <Image
-                      src="/placeholder.svg"
-                      alt={service.name}
-                      width={300}
-                      height={200}
-                      className="w-full h-32 object-cover rounded-lg mb-4"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg flex items-center justify-center">
-                      <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <service.icon className="w-6 h-6 text-blue-600" />
-                      </div>
+                    <div className={`w-16 h-16 bg-gradient-to-r ${service.gradient} rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
+                      <service.icon className="w-8 h-8 text-white" />
                     </div>
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">{service.name}</h3>
-                  <p className="text-sm text-gray-600">{service.count} Partners Ready</p>
+                  <h3 className="font-bold text-gray-900 mb-2 text-lg">{service.name}</h3>
+                  <p className="text-gray-600 text-sm">{service.count} Partners Ready</p>
                 </CardContent>
               </Card>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Referral Program */}
-      <section className="py-20 bg-gradient-to-br from-green-50 to-emerald-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <Badge className="bg-green-100 text-green-800 border-green-200 mb-4">
-              <Gift className="w-4 h-4 mr-2" />
-              Referral Program
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{t.referral.title}</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">{t.referral.subtitle}</p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <Card className="p-8 border-2 border-green-200 bg-white">
-                <CardContent className="p-0">
-                  <div className="flex items-center mb-6">
-                    <UserPlus className="w-8 h-8 text-green-600 mr-3" />
-                    <h3 className="text-2xl font-bold text-gray-900">Earn While You Wait</h3>
-                  </div>
-                  <ul className="space-y-4">
-                    {t.referral.benefits.map((benefit, index) => (
-                      <li key={index} className="flex items-center">
-                        <Star className="w-5 h-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-8">
-                    <Link href="/referral">
-                      <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
-                        {t.referral.cta}
-                        <ArrowRight className="ml-2 w-5 h-5" />
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="relative">
-              <Image
-                src="/placeholder.svg?height=400&width=500"
-                alt="Referral Program"
-                width={500}
-                height={400}
-                className="rounded-2xl shadow-xl"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-green-600/20 to-transparent rounded-2xl"></div>
-            </div>
           </div>
         </div>
       </section>
@@ -778,6 +830,85 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Earn While You Wait - Referral Section */}
+      <section className="py-20 bg-gradient-to-br from-green-50 to-emerald-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center mb-4">
+              <UserPlus className="w-8 h-8 text-green-600 mr-3" />
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Earn While You Wait</h2>
+            </div>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Share your love for BookNow and earn amazing rewards while we prepare for launch
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <Star className="w-6 h-6 text-green-600" />
+                  <span className="text-lg font-semibold text-gray-900">₹500 credit for every friend who joins</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Star className="w-6 h-6 text-green-600" />
+                  <span className="text-lg font-semibold text-gray-900">Unlock premium features early</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Star className="w-6 h-6 text-green-600" />
+                  <span className="text-lg font-semibold text-gray-900">Exclusive referrer badges</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Star className="w-6 h-6 text-green-600" />
+                  <span className="text-lg font-semibold text-gray-900">Special launch party invites</span>
+                </div>
+              </div>
+              
+              <Button
+                size="lg"
+                className="bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-6 w-full sm:w-auto"
+                onClick={handleReferNow}
+              >
+                <ArrowRight className="mr-2 w-5 h-5" />
+                Start Referring Now
+              </Button>
+            </div>
+
+            <Card className="p-8 bg-white border-2 border-green-200 shadow-xl">
+              <CardContent className="p-0">
+                <div className="text-center">
+                  <Gift className="w-16 h-16 text-green-600 mx-auto mb-6" />
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">How Referrals Work</h3>
+                  <div className="space-y-4 text-left">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">Get Your Code</h4>
+                        <p className="text-gray-600 text-sm">Receive your unique referral code instantly</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">Share with Friends</h4>
+                        <p className="text-gray-600 text-sm">Share via social media, WhatsApp, or email</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">Earn Rewards</h4>
+                        <p className="text-gray-600 text-sm">Get ₹500 credit when they join successfully</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* How It Will Work */}
       <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -790,15 +921,15 @@ export default function HomePage() {
             {t.howItWorks.steps.map((step, index) => (
               <div key={index} className="text-center group">
                 <div className="relative mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                  <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-lg">
                     <span className="text-2xl font-bold text-white">{index + 1}</span>
                   </div>
                   {index < 2 && (
-                    <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-blue-200 to-purple-200 transform -translate-x-8"></div>
+                    <div className="hidden md:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-blue-200 to-purple-200 transform -translate-x-10"></div>
                   )}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
-                <p className="text-gray-600">{step.description}</p>
+                <p className="text-gray-600 leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
@@ -882,11 +1013,6 @@ export default function HomePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/referral" className="hover:text-white transition-colors">
-                    Referral Program
-                  </Link>
-                </li>
-                <li>
                   <Link href="/register?type=business" className="hover:text-white transition-colors">
                     For Businesses
                   </Link>
@@ -894,6 +1020,11 @@ export default function HomePage() {
                 <li>
                   <Link href="/contact" className="hover:text-white transition-colors">
                     Contact
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/updates" className="hover:text-white transition-colors">
+                    Launch Updates
                   </Link>
                 </li>
               </ul>
@@ -919,7 +1050,7 @@ export default function HomePage() {
                 </li>
                 <li>
                   <Link href="/updates" className="hover:text-white transition-colors">
-                    Launch Updates
+                    Platform Updates
                   </Link>
                 </li>
               </ul>
@@ -943,6 +1074,64 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Referral Modal */}
+      <Dialog open={showReferralModal} onOpenChange={setShowReferralModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-green-600">
+              <Gift className="w-6 h-6 mr-2" />
+              Share & Earn ₹500
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div className="text-center">
+              <p className="text-gray-600 mb-4">Your unique referral code:</p>
+              <div className="bg-gray-100 p-4 rounded-lg border-2 border-dashed border-gray-300">
+                <div className="text-2xl font-bold text-green-600 tracking-wider mb-3">{referralCode}</div>
+                <Button onClick={copyReferralCode} className="bg-green-600 hover:bg-green-700 text-white">
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy Code
+                </Button>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4">Share on Social Media</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={() => shareOnSocial("whatsapp")}
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  WhatsApp
+                </Button>
+                <Button onClick={() => shareOnSocial("twitter")} className="bg-blue-400 hover:bg-blue-500 text-white">
+                  <Twitter className="w-4 h-4 mr-2" />
+                  Twitter
+                </Button>
+                <Button onClick={() => shareOnSocial("facebook")} className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Facebook className="w-4 h-4 mr-2" />
+                  Facebook
+                </Button>
+                <Button onClick={() => shareOnSocial("linkedin")} className="bg-blue-700 hover:bg-blue-800 text-white">
+                  <Linkedin className="w-4 h-4 mr-2" />
+                  LinkedIn
+                </Button>
+              </div>
+            </div>
+
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h4 className="font-semibold text-green-900 mb-2">💰 You Earn:</h4>
+              <ul className="text-sm text-green-800 space-y-1">
+                <li>• ₹500 credit per successful referral</li>
+                <li>• Bonus rewards at 5, 10, 25 referrals</li>
+                <li>• Exclusive referrer badges</li>
+              </ul>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

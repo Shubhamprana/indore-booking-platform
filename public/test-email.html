@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email Test</title>
+</head>
+<body>
+    <h1>Email API Test</h1>
+    <button onclick="testEmail()">Test Email Send</button>
+    <div id="result"></div>
+
+    <script>
+        async function testEmail() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Sending...';
+            
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        email: 'test@example.com',
+                        subject: 'Test Email',
+                        message: 'This is a test message to verify email functionality.'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<p style="color: green;">Success: ${result.message}</p>`;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">Error: ${result.error}<br>Details: ${result.details}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">Network Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html> 
