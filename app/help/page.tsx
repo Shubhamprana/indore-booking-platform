@@ -110,7 +110,7 @@ export default function HelpPage() {
 
   const videoTutorials = [
     {
-      title: "BookNow Overview - Getting Started",
+      title: "FastBookr Overview - Getting Started",
       duration: "5:30",
       thumbnail: "/placeholder.svg?height=120&width=200",
       category: "Getting Started",
@@ -161,9 +161,9 @@ export default function HelpPage() {
       category: "Security & Privacy",
     },
     {
-      question: "Can I use BookNow for my business?",
+      question: "Can I use FastBookrfor my business?",
       answer:
-        "BookNow offers comprehensive business solutions. You can manage appointments, track analytics, process payments, and much more. Sign up for a business account to get started.",
+        "FastBookr offers comprehensive business solutions. You can manage appointments, track analytics, process payments, and much more. Sign up for a business account to get started.",
       category: "Business Features",
     },
     {
@@ -219,14 +219,14 @@ export default function HelpPage() {
               <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold">BookNow</span>
+              <span className="text-xl font-bold">FastBookr</span>
               <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
                 Help Center
               </Badge>
             </Link>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">How can we help you?</h1>
             <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              Find answers to your questions, learn how to use BookNow, and get the support you need.
+              Find answers to your questions, learn how to use FastBookr, and get the support you need.
             </p>
 
             {/* Search Bar */}
@@ -523,7 +523,7 @@ export default function HelpPage() {
                   </Button>
                   <Button variant="outline" className="border-red-300 text-red-700 hover:bg-red-50">
                     <Mail className="w-4 h-4 mr-2" />
-                    urgent@booknow.com
+                    urgent@FastBookr.com
                   </Button>
                 </div>
               </CardContent>
@@ -534,7 +534,7 @@ export default function HelpPage() {
               <CardContent className="p-8 text-center">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Join Our Community</h3>
                 <p className="text-gray-600 mb-6">
-                  Connect with other BookNow users, share tips, and get help from the community
+                  Connect with other FastBookr users, share tips, and get help from the community
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button variant="outline">

@@ -451,6 +451,7 @@ export default function BusinessPage() {
                       alt="Kumar's Restaurant"
                       width={400}
                       height={300}
+                      style={{ height: "auto" }}
                       className="rounded-lg shadow-lg"
                     />
                   </div>

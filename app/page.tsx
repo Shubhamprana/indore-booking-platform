@@ -22,7 +22,6 @@ import {
   CheckCircle,
   ArrowRight,
   Globe,
-  Calendar,
   Gift,
   Menu,
   X,
@@ -50,6 +49,10 @@ import { AnimatedCounter } from "@/components/animated-counter"
 import { LocationSelector } from "@/components/location-selector"
 import { LaunchCountdown } from "@/components/launch-countdown"
 import { BusinessSearch } from "@/components/business-search"
+import { HeroImage } from "@/components/hero-image"
+import { StatsSection } from "@/components/stats-section"
+import { ServicesSection } from "@/components/services-section"
+import { ReferralSection } from "@/components/referral-section"
 import { useAuth } from "@/hooks/use-auth"
 
 export default function HomePage() {
@@ -246,10 +249,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">BookNow</span>
+              <Image src="/logo-without-name.png" alt="FastBookr Logo" width={40} height={40} className="rounded-lg" />
+              <span className="text-xl font-bold text-gray-900">FastBookr</span>
               <Badge variant="secondary" className="ml-2 bg-orange-100 text-orange-800">
                 Pre-Launch
               </Badge>
@@ -339,14 +340,14 @@ export default function HomePage() {
                 ) : !authLoading ? (
                   // Not logged in
                   <>
-                    <Link href="/login">
-                      <Button variant="outline">{t.nav.login}</Button>
-                    </Link>
-                    <Link href="/register">
-                      <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                        {t.nav.signup}
-                      </Button>
-                    </Link>
+                <Link href="/login">
+                  <Button variant="outline">{t.nav.login}</Button>
+                </Link>
+                <Link href="/register">
+                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                    {t.nav.signup}
+                  </Button>
+                </Link>
                   </>
                 ) : (
                   // Loading state
@@ -431,16 +432,16 @@ export default function HomePage() {
                   </div>
                 ) : !authLoading ? (
                   // Not logged in - mobile
-                  <div className="flex space-x-2 pt-4 border-t border-gray-200">
-                    <Link href="/login" className="flex-1">
-                      <Button variant="outline" className="w-full">
-                        {t.nav.login}
-                      </Button>
-                    </Link>
-                    <Link href="/register" className="flex-1">
-                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600">{t.nav.signup}</Button>
-                    </Link>
-                  </div>
+                <div className="flex space-x-2 pt-4 border-t border-gray-200">
+                  <Link href="/login" className="flex-1">
+                    <Button variant="outline" className="w-full">
+                      {t.nav.login}
+                    </Button>
+                  </Link>
+                  <Link href="/register" className="flex-1">
+                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600">{t.nav.signup}</Button>
+                  </Link>
+                </div>
                 ) : (
                   // Loading state - mobile
                   <div className="pt-4 border-t border-gray-200">
@@ -515,62 +516,16 @@ export default function HomePage() {
               </div>
 
               {/* Launch Countdown */}
-              <LaunchCountdown />
+              {/* <LaunchCountdown />  #commented out for now */}
             </div>
 
-            <div className="relative animate-float">
-              <div className="relative z-10">
-                <Image
-                  src="/placeholder.svg?height=600&width=500"
-                  alt="BookNow App Preview"
-                  width={500}
-                  height={600}
-                  className="rounded-2xl shadow-2xl"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl flex items-end justify-center pb-8">
-                  <Badge className="bg-white/90 text-gray-900 backdrop-blur-sm">
-                    <Rocket className="w-4 h-4 mr-2" />
-                    Coming Soon
-                  </Badge>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-2xl blur-3xl opacity-20 transform rotate-6 animate-pulse"></div>
-            </div>
+            <HeroImage />
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-3xl md:text-4xl font-bold mb-2">
-                <AnimatedCounter end={15000} suffix="+" />
-              </div>
-              <div className="text-blue-100">{t.stats.preRegistered}</div>
-            </div>
-            <div>
-              <div className="text-3xl md:text-4xl font-bold mb-2">
-                <AnimatedCounter end={50} suffix="+" />
-              </div>
-              <div className="text-blue-100">{t.stats.cities}</div>
-            </div>
-            <div>
-              <div className="text-3xl md:text-4xl font-bold mb-2">
-                <AnimatedCounter end={2000} suffix="+" />
-              </div>
-              <div className="text-blue-100">{t.stats.businesses}</div>
-            </div>
-            <div>
-              <div className="text-3xl md:text-4xl font-bold mb-2">
-                <AnimatedCounter end={5000} suffix="+" />
-              </div>
-              <div className="text-blue-100">{t.stats.referrals}</div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <StatsSection stats={t.stats} />
 
       {/* Business Search & Follow Section - Only for logged in users */}
       {profile && !authLoading && (
@@ -581,7 +536,7 @@ export default function HomePage() {
                 Discover & Connect with Businesses
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Find and follow local businesses, connect with entrepreneurs, and build your network
+                Find and follow local businesses
               </p>
             </div>
             <BusinessSearch 
@@ -594,102 +549,19 @@ export default function HomePage() {
       )}
 
       {/* Services Preview */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{t.services.title}</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">{t.services.subtitle}</p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {services.map((service, index) => (
-              <Card
-                key={index}
-                className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-2 cursor-pointer group relative overflow-hidden"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="absolute top-2 right-2">
-                  <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">
-                    Soon
-                  </Badge>
-                </div>
-                <CardContent className="p-0 text-center">
-                  <div className="relative mb-4">
-                    <Image
-                      src={service.image || "/placeholder.svg"}
-                      alt={service.name}
-                      width={300}
-                      height={200}
-                      className="w-full h-32 object-cover rounded-lg mb-4"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg flex items-center justify-center">
-                      <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <service.icon className="w-6 h-6 text-blue-600" />
-                      </div>
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">{service.name}</h3>
-                  <p className="text-sm text-gray-600">{service.count} Partners Ready</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ServicesSection 
+        services={services} 
+        title={t.services.title} 
+        subtitle={t.services.subtitle} 
+      />
 
       {/* Referral Program */}
-      <section className="py-20 bg-gradient-to-br from-green-50 to-emerald-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <Badge className="bg-green-100 text-green-800 border-green-200 mb-4">
-              <Gift className="w-4 h-4 mr-2" />
-              Referral Program
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{t.referral.title}</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">{t.referral.subtitle}</p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <Card className="p-8 border-2 border-green-200 bg-white">
-                <CardContent className="p-0">
-                  <div className="flex items-center mb-6">
-                    <UserPlus className="w-8 h-8 text-green-600 mr-3" />
-                    <h3 className="text-2xl font-bold text-gray-900">Earn While You Wait</h3>
-                  </div>
-                  <ul className="space-y-4">
-                    {t.referral.benefits.map((benefit, index) => (
-                      <li key={index} className="flex items-center">
-                        <Star className="w-5 h-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-8">
-                    <Link href="/referral">
-                      <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
-                        {t.referral.cta}
-                        <ArrowRight className="ml-2 w-5 h-5" />
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="relative">
-              <Image
-                src="/placeholder.svg?height=400&width=500"
-                alt="Referral Program"
-                width={500}
-                height={400}
-                className="rounded-2xl shadow-xl"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-green-600/20 to-transparent rounded-2xl"></div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ReferralSection 
+        title={t.referral.title}
+        subtitle={t.referral.subtitle}
+        benefits={t.referral.benefits}
+        cta={t.referral.cta}
+      />
 
       {/* Value Propositions */}
       <section className="py-20 bg-white">
@@ -797,7 +669,7 @@ export default function HomePage() {
               <Button
                 variant="outline"
                 size="lg"
-                className="text-lg px-8 py-6 border-2 border-white text-white hover:bg-white hover:text-blue-600 w-full sm:w-auto"
+                className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-6 w-full sm:w-auto"
               >
                 Partner with Us
                 <TrendingUp className="ml-2 w-5 h-5" />
@@ -828,10 +700,8 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
               <Link href="/" className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold">BookNow</span>
+                <Image src="/logo-without-name.png" alt="FastBookr Logo" width={40} height={40} className="rounded-lg" />
+                <span className="text-xl font-bold">FastBookr</span>
                 <Badge variant="secondary" className="bg-orange-100 text-orange-800">
                   Pre-Launch
                 </Badge>
@@ -901,16 +771,16 @@ export default function HomePage() {
 
           <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-center md:text-left">
-              &copy; 2024 BookNow. All rights reserved. Coming soon to revolutionize booking.
+              &copy; 2024 FastBookr. All rights reserved. Coming soon to revolutionize booking.
             </p>
             <div className="flex space-x-4 mt-4 md:mt-0">
               <div className="flex items-center text-gray-400">
                 <Phone className="w-4 h-4 mr-2" />
-                <span>+1-800-BOOKNOW</span>
+                <span>+1-800-FASTBOOKR</span>
               </div>
               <div className="flex items-center text-gray-400">
                 <Mail className="w-4 h-4 mr-2" />
-                <span>hello@booknow.com</span>
+                <span>hello@fastbookr.com</span>
               </div>
             </div>
           </div>

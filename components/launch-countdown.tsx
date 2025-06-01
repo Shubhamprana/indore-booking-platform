@@ -10,8 +10,12 @@ export function LaunchCountdown() {
     minutes: 0,
     seconds: 0,
   })
+  const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
+    // Mark as hydrated on client
+    setIsHydrated(true)
+    
     // Set launch date to 3 months from now
     const launchDate = new Date()
     launchDate.setMonth(launchDate.getMonth() + 3)
@@ -35,6 +39,38 @@ export function LaunchCountdown() {
 
     return () => clearInterval(timer)
   }, [])
+
+  // Don't render countdown until hydrated to prevent hydration mismatch
+  if (!isHydrated) {
+    return (
+      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+        <CardContent className="p-6">
+          <div className="text-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Launch Countdown</h3>
+            <p className="text-sm text-gray-600">Get ready for the revolution!</p>
+          </div>
+          <div className="grid grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold text-blue-600">--</div>
+              <div className="text-xs text-gray-500">Days</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-blue-600">--</div>
+              <div className="text-xs text-gray-500">Hours</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-blue-600">--</div>
+              <div className="text-xs text-gray-500">Minutes</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-blue-600">--</div>
+              <div className="text-xs text-gray-500">Seconds</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">

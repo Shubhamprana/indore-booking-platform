@@ -73,7 +73,7 @@ export default function LoginPage() {
             <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <Calendar className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">BookNow</span>
+            <span className="text-2xl font-bold text-gray-900">FastBookr</span>
           </Link>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back!</h2>
           <p className="text-gray-600">Sign in to your account to continue booking</p>
@@ -246,18 +246,18 @@ export default function LoginPage() {
         </div>
 
         {/* Demo Credentials */}
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-start space-x-2">
-              <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5" />
-              <div className="text-sm text-blue-800">
-                <p className="font-medium mb-1">Demo Credentials:</p>
-                <p>Email: demo@booknow.com</p>
-                <p>Password: demo123</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* <Card className="bg-blue-50 border-blue-200"> */}
+          {/* <CardContent className="p-4"> */}
+            {/* <div className="flex items-start space-x-2"> */}
+              {/* <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5" /> */}
+              {/* <div className="text-sm text-blue-800"> */}
+                {/* <p className="font-medium mb-1">Demo Credentials:</p> */}
+                {/* <p>Email: demo@booknow.com</p> */}
+                {/* <p>Password: demo123</p> */}
+              {/* </div> */}
+            {/* </div> */}
+          {/* </CardContent> */}
+        {/* </Card> */}
       </div>
     </div>
   )

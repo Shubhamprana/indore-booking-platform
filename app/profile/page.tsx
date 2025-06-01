@@ -369,7 +369,7 @@ export default function ProfilePage() {
               <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold">BookNow</span>
+              <span className="text-xl font-bold">FastBookr</span>
               <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
                 Pre-Launch
               </Badge>
@@ -377,27 +377,27 @@ export default function ProfilePage() {
             <div className="flex items-center space-x-4">
               <Button 
                 variant="outline" 
-                className="border-white/30 text-white hover:bg-white/10"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 onClick={refreshStats}
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
                 Refresh Stats
               </Button>
               <Link href="/">
-                <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                <Button variant="outline" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                   Home
                 </Button>
               </Link>
               {profile?.user_type === 'business' && (
                 <Link href="/business/dashboard">
-                  <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                  <Button variant="outline" className="border-blue/30 text-white hover:bg-white/10">
                     Dashboard
                   </Button>
                 </Link>
               )}
               <Button 
                 variant="outline" 
-                className="border-white/30 text-white hover:bg-white/10"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 onClick={async () => {
                   await signOut()
                   window.location.href = "/login"

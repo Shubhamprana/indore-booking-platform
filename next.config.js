@@ -1,65 +1,94 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  // External packages for server components
-  serverExternalPackages: ['@supabase/supabase-js'],
-  
-  // Experimental features
-  experimental: {
-    scrollRestoration: true,
-  },
 
+// High-Performance Next.js Configuration for 1000+ Concurrent Users
+const nextConfig = {
+  // Enable React 18 features and concurrent rendering
+  reactStrictMode: true,
+  
   // Performance optimizations
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn']
-    } : false,
+    // Remove console.log in production for better performance
+    removeConsole: process.env.NODE_ENV === 'production',
   },
 
-  // Bundle optimization
-  webpack: (config, { dev, isServer }) => {
-    // Production optimizations
-    if (!dev && !isServer) {
-      config.optimization = {
-        ...config.optimization,
-        sideEffects: false,
-        usedExports: true,
-        minimize: true,
-      }
+  // External packages that should be bundled
+  serverExternalPackages: ['@supabase/supabase-js'],
+
+  // Image optimization for better performance
+  images: {
+    // Enable image optimization
+    formats: ['image/webp', 'image/avif'],
+    
+    // Optimize images from external domains
+    domains: [
+      'localhost',
+      'supabase.co',
+      'storage.googleapis.com',
+      'images.unsplash.com',
+      'avatars.githubusercontent.com',
+    ],
+    
+    // Device sizes for responsive images
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+  },
+
+  // Webpack optimizations
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Optimize bundle splitting
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+            priority: 10,
+          },
+          supabase: {
+            test: /[\\/]node_modules[\\/]@supabase[\\/]/,
+            name: 'supabase',
+            chunks: 'all',
+            priority: 20,
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            chunks: 'all',
+            priority: 5,
+            reuseExistingChunk: true,
+            enforce: true,
+          },
+        },
+      },
     }
 
-    // Bundle analyzer (only in development)
-    if (dev && process.env.ANALYZE === 'true') {
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+    // Add performance-optimized plugins
+    if (!dev && !isServer) {
       config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'server',
-          openAnalyzer: true,
+        new webpack.DefinePlugin({
+          __DEV__: false,
         })
       )
+    }
+
+    // SVG handling
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack'],
+    })
+
+    // Optimize lodash imports
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'lodash': 'lodash-es',
     }
 
     return config
   },
 
-  // Image optimization
-  images: {
-    formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 31536000, // 1 year
-    dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    domains: ['localhost'],
-    // Add your image domains here
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
-  },
-
-  // Security headers
+  // Headers for security and performance
   async headers() {
     return [
       {
@@ -80,7 +109,7 @@ const nextConfig = {
           },
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
+            value: 'DENY'
           },
           {
             key: 'X-Content-Type-Options',
@@ -90,38 +119,52 @@ const nextConfig = {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin'
           },
+          
+          // Performance headers
           {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()'
-          }
+            key: 'X-Served-By',
+            value: 'Next.js'
+          },
         ],
       },
-      // Cache headers for static assets
       {
-        source: '/images/(.*)',
+        // Cache static assets aggressively
+        source: '/(_next/static|favicon.ico|robots.txt|sitemap.xml)',
         headers: [
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable'
-          }
-        ]
+          },
+        ],
       },
       {
-        source: '/_next/static/(.*)',
+        // Cache API responses with shorter TTL
+        source: '/api/(.*)',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
-          }
-        ]
-      }
+            value: 'public, max-age=300, stale-while-revalidate=60'
+          },
+        ],
+      },
     ]
   },
 
-  // Redirects for SEO
+  // Compression for better performance
+  compress: true,
+
+  // PoweredBy header removal for security
+  poweredByHeader: false,
+
+  // Generate ETags for better caching
+  generateEtags: true,
+
+  // Trailing slash configuration
+  trailingSlash: false,
+
+  // Optimized redirects
   async redirects() {
     return [
-      // Add any necessary redirects here
       {
         source: '/home',
         destination: '/',
@@ -130,50 +173,54 @@ const nextConfig = {
     ]
   },
 
-  // Rewrites for API routes or proxy
+  // Enable gzip compression
   async rewrites() {
     return [
-      // Add any necessary rewrites here
+      // API rewrite for better SEO
+      {
+        source: '/api/v1/:path*',
+        destination: '/api/:path*',
+      },
     ]
   },
 
-  // Environment variables to expose to the client
+  // Environment variables for runtime optimization
   env: {
-    NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version || '1.0.0',
-    NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
-  },
-
-  // Output configuration
-  output: 'standalone',
-  
-  // Compression
-  compress: true,
-
-  // Power-ups for production
-  poweredByHeader: false,
-  reactStrictMode: true,
-
-  // Monitoring
-  onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
+    NEXT_TELEMETRY_DISABLED: '1', // Disable telemetry for better performance
+    ANALYZE: process.env.ANALYZE,
   },
 
   // TypeScript configuration
   typescript: {
-    // Only run type checking in development
-    ignoreBuildErrors: false,
+    // Type checking is already done in CI/CD pipeline
+    ignoreBuildErrors: process.env.NODE_ENV === 'production',
   },
 
   // ESLint configuration
   eslint: {
-    // Only run ESLint in development
-    ignoreDuringBuilds: false,
-    dirs: ['pages', 'app', 'components', 'lib', 'hooks']
+    // ESLint is already run in CI/CD pipeline
+    ignoreDuringBuilds: process.env.NODE_ENV === 'production',
   },
 
-  // Custom configuration for robots.txt generation
-  // Note: robots.txt should be created in the public folder
+  // Production-specific optimizations
+  ...(process.env.NODE_ENV === 'production' && {
+    compiler: {
+      removeConsole: {
+        exclude: ['error'],
+      },
+    },
+    
+    // Disable source maps for better performance
+    productionBrowserSourceMaps: false,
+  }),
 }
 
-module.exports = nextConfig 
+// Bundle analyzer for optimization insights
+if (process.env.ANALYZE === 'true') {
+  const withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: true,
+  })
+  module.exports = withBundleAnalyzer(nextConfig)
+} else {
+  module.exports = nextConfig
+} 

@@ -5,21 +5,22 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Users, Heart, Zap, Shield, Calendar, CheckCircle, ArrowRight, Linkedin, Twitter, Mail } from "lucide-react"
 import Image from "next/image"
+// import Image from "public/servise.png"
 import Link from "next/link"
 
 export default function AboutPage() {
   const team = [
     {
-      name: "Rajesh Kumar",
+      name: "Shubham prajapati",
       role: "Founder & CEO",
-      image: "/placeholder.svg?height=200&width=200",
-      bio: "Former tech executive with 15+ years in booking platforms",
+      image: "/Shubham.png?height=200&width=200",
+      bio: "Former tech executive with 5+ years in booking platforms",
       linkedin: "#",
       twitter: "#",
     },
     {
-      name: "Priya Sharma",
-      role: "CTO",
+      name: "Saurav Sharma",
+      role: "CO-founder",
       image: "/placeholder.svg?height=200&width=200",
       bio: "Full-stack developer passionate about scalable solutions",
       linkedin: "#",
@@ -83,12 +84,12 @@ export default function AboutPage() {
               <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold">BookNow</span>
+              <span className="text-xl font-bold">FastBookr</span>
               <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
                 Pre-Launch
               </Badge>
             </Link>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">About BookNow</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">About FastBookr</h1>
             <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
               We're on a mission to eliminate waiting and make booking services as simple as a single tap.
             </p>
@@ -112,7 +113,7 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
             <div className="space-y-4 text-gray-600">
               <p>
-                BookNow was born from a simple frustration: waiting in long queues and struggling to book appointments
+                FastBookr was born from a simple frustration: waiting in long queues and struggling to book appointments
                 with busy service providers. Our founders experienced this pain point repeatedly - from waiting hours at
                 restaurants to struggling to book salon appointments.
               </p>
@@ -136,10 +137,12 @@ export default function AboutPage() {
           </div>
           <div className="relative">
             <Image
-              src="/placeholder.svg?height=400&width=500"
+              src="/servise.png"
               alt="Our Story"
               width={500}
               height={400}
+              priority
+              style={{ height: "auto" }}
               className="rounded-2xl shadow-xl"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-blue-600/20 to-transparent rounded-2xl"></div>
@@ -182,6 +185,7 @@ export default function AboutPage() {
                     alt={member.name}
                     width={200}
                     height={200}
+                    style={{ height: "auto" }}
                     className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
                   />
                   <h3 className="text-xl font-semibold text-gray-900 mb-1">{member.name}</h3>

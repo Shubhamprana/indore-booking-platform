@@ -258,6 +258,7 @@ export default function ServicesPage() {
                       alt={service.name}
                       width={300}
                       height={200}
+                      style={{ height: "auto" }}
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-4 right-4 flex space-x-2">

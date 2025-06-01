@@ -90,7 +90,7 @@ export function Navigation({
             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <Calendar className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">BookNow</span>
+            <span className="text-xl font-bold text-gray-900">FastBookr 00</span>
             <Badge variant="secondary" className="ml-2 bg-orange-100 text-orange-800">
               Pre-Launch
             </Badge>

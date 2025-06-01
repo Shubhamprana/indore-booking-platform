@@ -11,9 +11,12 @@ export default function ClientWrapper({ children, fallback }: ClientWrapperProps
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    // This ensures the component only renders on the client side
-    // after hydration is complete
+    // Set a small timeout to ensure DOM is ready
+    const timer = setTimeout(() => {
     setIsClient(true)
+    }, 100)
+
+    return () => clearTimeout(timer)
   }, [])
 
   // During SSR and before hydration, show a consistent loading state

@@ -36,7 +36,7 @@ export default function WelcomePage() {
     {
       icon: Share2,
       title: "Share Your Referral Code",
-      description: "Invite friends and earn ₹500 for each successful referral",
+      description: "Invite friends and earn ₹50 for each 2 successful referral",
       action: "Start Sharing",
       color: "green",
     },
@@ -81,7 +81,7 @@ export default function WelcomePage() {
   }
 
   const shareOnSocial = (platform: string) => {
-    const message = `I just joined the BookNow pre-launch! 🚀 Skip the wait and book instantly when it launches. Join me with my referral code: ${referralCode}`
+    const message = `I just joined the FastBookr pre-launch! 🚀 Skip the wait and book instantly when it launches. Join me with my referral code: ${referralCode}`
     const url = `https://booknow.com/register?ref=${referralCode}`
 
     let shareUrl = ""
@@ -120,7 +120,7 @@ export default function WelcomePage() {
             </Badge>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome to the BookNow Family! 🎉</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome to the FastBookr Family! 🎉</h1>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
             You're now part of an exclusive community of early adopters who will shape the future of booking. Get ready
             for an amazing journey!
@@ -167,7 +167,7 @@ export default function WelcomePage() {
               <div className="bg-white p-4 rounded-lg">
                 <h3 className="font-semibold text-green-900 mb-3">💰 You Earn:</h3>
                 <ul className="space-y-2 text-sm text-green-800">
-                  <li>• ₹500 credit per successful referral</li>
+                  <li>• ₹50 credit per successful referral</li>
                   <li>• Bonus rewards at 5, 10, 25 referrals</li>
                   <li>• Exclusive referrer badges</li>
                   <li>• VIP launch event access</li>
@@ -176,7 +176,7 @@ export default function WelcomePage() {
               <div className="bg-white p-4 rounded-lg">
                 <h3 className="font-semibold text-green-900 mb-3">🎁 Friends Get:</h3>
                 <ul className="space-y-2 text-sm text-green-800">
-                  <li>• ₹500 welcome bonus</li>
+                  <li>• ₹50 welcome bonus</li>
                   <li>• All pre-launch benefits</li>
                   <li>• Priority early access</li>
                   <li>• Exclusive member perks</li>
@@ -322,11 +322,11 @@ export default function WelcomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm text-gray-500">
             <div className="flex items-center">
               <Mail className="w-4 h-4 mr-2" />
-              <span>hello@booknow.com</span>
+              <span>hello@FastBookr.com</span>
             </div>
             <div className="flex items-center">
               <MessageCircle className="w-4 h-4 mr-2" />
-              <span>+1-800-BOOKNOW</span>
+              <span>+1-800-FastBookr</span>
             </div>
           </div>
         </div>

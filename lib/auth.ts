@@ -15,6 +15,45 @@ import {
   initializeBusinessDashboard 
 } from "./business-subscription"
 
+// Utility function to handle auth errors
+export const handleAuthError = async (error: any) => {
+  if (error?.message?.includes("refresh_token_not_found") || 
+      error?.message?.includes("Invalid Refresh Token") ||
+      error?.message?.includes("refresh token")) {
+    console.warn("Refresh token issue detected, signing out user")
+    try {
+      await supabase.auth.signOut()
+    } catch (signOutError) {
+      console.error("Error during emergency sign out:", signOutError)
+    }
+    // Optionally reload the page to clear any stale state
+    if (typeof window !== 'undefined') {
+      window.location.reload()
+    }
+    return true // Indicates error was handled
+  }
+  return false // Indicates error was not a refresh token issue
+}
+
+// Enhanced function to safely get current user with error handling
+export const getCurrentUserSafe = async () => {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    
+    if (error) {
+      const handled = await handleAuthError(error)
+      if (handled) return null
+      throw new Error(`Failed to get current user: ${error.message}`)
+    }
+    
+    return user
+  } catch (error) {
+    console.error("Get current user error:", error)
+    await handleAuthError(error)
+    return null
+  }
+}
+
 export interface LoginCredentials {
   email: string
   password: string
@@ -56,6 +95,14 @@ export const login = async (loginData: LoginData) => {
       throw new Error("Password is required")
     }
 
+    // Clear any existing invalid session before login
+    try {
+      await supabase.auth.signOut()
+    } catch (signOutError) {
+      // Ignore sign out errors as user might not be signed in
+      console.log("Pre-login cleanup (expected if not signed in):", signOutError)
+    }
+
     // Sign in with Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
       email: loginData.email.toLowerCase(),
@@ -63,6 +110,11 @@ export const login = async (loginData: LoginData) => {
     })
 
     if (error) {
+      const handled = await handleAuthError(error)
+      if (handled) {
+        throw new Error("Authentication session expired. Please try logging in again.")
+      }
+      
       if (error.message.includes("Invalid login credentials")) {
         throw new Error("Invalid email or password")
       }
@@ -257,12 +309,61 @@ export const register = async (registerData: RegisterData) => {
   }
 }
 
+// Cleanup utility to clear corrupted auth state
+export const cleanupAuthState = async () => {
+  try {
+    // Check if we have a session
+    const { data: { session }, error } = await supabase.auth.getSession()
+    
+    if (error && (error.message.includes("refresh_token_not_found") || 
+                  error.message.includes("Invalid Refresh Token"))) {
+      console.log("Cleaning up corrupted auth state")
+      await supabase.auth.signOut()
+      
+      // Clear any cached auth data
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('sb-auth-token')
+        sessionStorage.removeItem('auth-error')
+      }
+      
+      // Clear user cache
+      currentUserCache = null
+      
+      return true // Indicates cleanup was performed
+    }
+    
+    return false // No cleanup needed
+  } catch (error) {
+    console.error("Error during auth cleanup:", error)
+    // Force cleanup if there's any error
+    try {
+      await supabase.auth.signOut()
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('sb-auth-token')
+        sessionStorage.removeItem('auth-error')
+      }
+      currentUserCache = null
+    } catch (cleanupError) {
+      console.error("Force cleanup error:", cleanupError)
+    }
+    return true
+  }
+}
+
 export const logout = async () => {
   try {
     const { error } = await supabase.auth.signOut()
     if (error) {
       throw new Error(`Logout failed: ${error.message}`)
     }
+    
+    // Clear cache and storage
+    currentUserCache = null
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('sb-auth-token')
+      sessionStorage.removeItem('auth-error')
+    }
+    
     return { message: "Logged out successfully" }
   } catch (error) {
     console.error("Logout error:", error)
@@ -281,11 +382,8 @@ export const getCurrentUser = async () => {
       return currentUserCache
     }
 
-    const { data: { user }, error } = await supabase.auth.getUser()
+    const user = await getCurrentUserSafe()
     
-    if (error) {
-      throw new Error(`Failed to get current user: ${error.message}`)
-    }
     if (!user) {
       currentUserCache = null
       return null
@@ -315,6 +413,7 @@ export const getCurrentUser = async () => {
     return result
   } catch (error) {
     console.error("Get current user error:", error)
+    await handleAuthError(error)
     currentUserCache = null
     return null
   }

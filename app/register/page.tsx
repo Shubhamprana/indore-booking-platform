@@ -49,6 +49,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isClient, setIsClient] = useState(false)
   const [formData, setFormData] = useState({
     // Personal Info
     fullName: "",
@@ -77,6 +78,8 @@ export default function RegisterPage() {
   const totalSteps = 5
 
   useEffect(() => {
+    // Set client flag to prevent hydration issues
+    setIsClient(true)
     // Generate unique referral code when component mounts
     const code = `BN${Math.random().toString(36).substring(2, 8).toUpperCase()}`
     setGeneratedReferralCode(code)
@@ -199,7 +202,7 @@ export default function RegisterPage() {
         setTimeout(() => {
           router.push("/register-complete")
         }, 2000)
-      }, 3000) // Optimized to 3 seconds with background processing
+      }, 5000) // Optimized to 5 seconds with background processing
 
       const result = await register(registerData)
       
@@ -946,7 +949,7 @@ export default function RegisterPage() {
               <Button
                 variant="outline"
                 onClick={handlePrevious}
-                disabled={currentStep === 1 || isLoading}
+                disabled={!isClient || currentStep === 1 || isLoading}
                 className="flex items-center space-x-2"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -957,6 +960,7 @@ export default function RegisterPage() {
                 <Button
                   onClick={handleSubmit}
                   disabled={
+                    !isClient ||
                     !userType ||
                     !formData.fullName ||
                     !formData.email ||
@@ -984,6 +988,7 @@ export default function RegisterPage() {
                 <Button
                   onClick={handleNext}
                   disabled={
+                    !isClient ||
                     (currentStep === 1 && !userType) ||
                     (currentStep === 2 &&
                       (!formData.fullName ||

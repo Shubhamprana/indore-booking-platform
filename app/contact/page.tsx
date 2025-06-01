@@ -42,23 +42,23 @@ export default function ContactPage() {
     {
       icon: Mail,
       title: "Email Us",
-      details: "hello@booknow.com",
+      details: "hello@FastBookr.com",
       description: "Get in touch for general inquiries",
-      action: "mailto:hello@booknow.com",
+      action: "mailto:hello@FastBookr.com",
     },
     {
       icon: Phone,
       title: "Call Us",
-      details: "+91 98765 43210",
+      details: "+91 9098523694",
       description: "Speak directly with our team",
-      action: "tel:+919876543210",
+      action: "tel:+91 9098523694",
     },
     {
       icon: MessageSquare,
       title: "WhatsApp",
-      details: "+91 98765 43210",
+      details: "+91 9098523694",
       description: "Quick support via WhatsApp",
-      action: "https://wa.me/919876543210",
+      action: "https://wa.me/91909853694",
     },
     {
       icon: MapPin,
@@ -71,7 +71,7 @@ export default function ContactPage() {
 
   const faqs = [
     {
-      question: "When will BookNow officially launch?",
+      question: "When will FastBookr officially launch?",
       answer:
         "We're planning to launch in Q2 2024. Pre-registered users will get early access before the public launch.",
     },
@@ -86,9 +86,9 @@ export default function ContactPage() {
         "Businesses can pre-register through our business signup form. We'll contact you with onboarding details as we approach launch.",
     },
     {
-      question: "Is there a cost to use BookNow?",
+      question: "Is there a cost to use FastBookr?",
       answer:
-        "BookNow is free for customers. Businesses pay a small commission only on successful bookings - no upfront costs or monthly fees.",
+        "FastBookr is free for customers. Businesses pay a small commission only on successful bookings - no upfront costs or monthly fees.",
     },
     {
       question: "What types of services will be available?",
@@ -126,14 +126,14 @@ export default function ContactPage() {
               <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold">BookNow</span>
+              <span className="text-xl font-bold">FastBookr</span>
               <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
                 Pre-Launch
               </Badge>
             </Link>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Get in Touch</h1>
             <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              Have questions about BookNow? Want to partner with us? We'd love to hear from you!
+              Have questions about FastBookr? Want to partner with us? We'd love to hear from you!
             </p>
           </div>
         </div>
@@ -370,7 +370,7 @@ export default function ContactPage() {
               </Button>
               <Button variant="outline" className="border-red-300 text-red-700 hover:bg-red-50">
                 <Mail className="w-4 h-4 mr-2" />
-                urgent@booknow.com
+                urgent@FastBookr.com
               </Button>
             </div>
           </CardContent>
