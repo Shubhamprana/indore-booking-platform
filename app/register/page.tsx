@@ -276,96 +276,96 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-6 sm:py-8 md:py-12">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center space-x-2 mb-6">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-white" />
+        <div className="text-center mb-6 sm:mb-8">
+          <Link href="/" className="inline-flex items-center space-x-2 mb-4 sm:mb-6">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <Calendar className="w-3 h-3 sm:w-5 sm:h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">BookNow</span>
-            <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+            <span className="text-lg sm:text-xl font-bold text-gray-900">FastBookr</span>
+            <Badge variant="secondary" className="bg-orange-100 text-orange-800 text-xs px-1 py-0.5 sm:px-2 sm:py-1">
               Pre-Launch
             </Badge>
           </Link>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Join the Booking Revolution</h1>
-          <p className="text-xl text-gray-600">Be among the first to experience the future of booking</p>
+          <h1 className="text-2xl xs:text-3xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">Join the Booking Revolution</h1>
+          <p className="text-base sm:text-lg md:text-xl text-gray-600">Be among the first to experience the future of booking</p>
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
             {Array.from({ length: totalSteps }, (_, i) => (
               <div key={i} className="flex items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium ${
                     i + 1 <= currentStep ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600"
                   }`}
                 >
-                  {i + 1 <= currentStep ? <CheckCircle className="w-4 h-4" /> : i + 1}
+                  {i + 1 <= currentStep ? <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" /> : i + 1}
                 </div>
                 {i < totalSteps - 1 && (
-                  <div className={`w-full h-1 mx-2 ${i + 1 < currentStep ? "bg-blue-600" : "bg-gray-200"}`} />
+                  <div className={`w-full h-0.5 sm:h-1 mx-1 sm:mx-2 ${i + 1 < currentStep ? "bg-blue-600" : "bg-gray-200"}`} />
                 )}
               </div>
             ))}
           </div>
-          <div className="text-center text-sm text-gray-600">
+          <div className="text-center text-xs sm:text-sm text-gray-600">
             Step {currentStep} of {totalSteps}
           </div>
         </div>
 
         <Card className="shadow-xl border-0">
-          <CardContent className="p-8">
+          <CardContent className="p-4 sm:p-6 md:p-8">
             {/* Step 1: User Type */}
             {currentStep === 1 && (
-              <div className="space-y-6">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">How will you use BookNow?</h2>
-                  <p className="text-gray-600">Choose your account type to get personalized pre-launch benefits</p>
+              <div className="space-y-4 sm:space-y-6">
+                <div className="text-center mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">How will you use FastBookr?</h2>
+                  <p className="text-sm sm:text-base text-gray-600">Choose your account type to get personalized pre-launch benefits</p>
                 </div>
 
                 <RadioGroup value={userType} onValueChange={setUserType}>
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
                     {/* Customer Option */}
                     <div className="relative">
                       <RadioGroupItem value="customer" id="customer" className="sr-only" />
                       <Label
                         htmlFor="customer"
-                        className={`block p-6 border-2 rounded-xl cursor-pointer transition-all ${
+                        className={`block p-4 sm:p-6 border-2 rounded-xl cursor-pointer transition-all ${
                           userType === "customer"
                             ? "border-blue-500 bg-blue-50"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                       >
-                        <div className="flex items-center mb-4">
-                          <Users className="w-8 h-8 text-blue-600 mr-3" />
-                          <div>
-                            <h3 className="text-xl font-semibold text-gray-900">I'm a Customer</h3>
-                            <p className="text-gray-600">Looking to book services</p>
+                        <div className="flex items-center mb-3 sm:mb-4">
+                          <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 mr-2 sm:mr-3 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-900">I'm a Customer</h3>
+                            <p className="text-sm sm:text-base text-gray-600">Looking to book services</p>
                           </div>
                         </div>
-                        <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                          <h4 className="font-semibold text-blue-900 mb-2">🎁 Pre-Launch Benefits:</h4>
-                          <ul className="space-y-1 text-sm text-blue-800">
+                        <div className="bg-blue-50 p-3 sm:p-4 rounded-lg mb-3 sm:mb-4">
+                          <h4 className="font-semibold text-blue-900 mb-2 text-sm sm:text-base">🎁 Pre-Launch Benefits:</h4>
+                          <ul className="space-y-1 text-xs sm:text-sm text-blue-800">
                             <li>• 50% off first 10 bookings</li>
                             <li>• Lifetime premium features</li>
                             <li>• Priority customer support</li>
                             <li>• Exclusive launch events</li>
                           </ul>
                         </div>
-                        <ul className="space-y-2 text-sm text-gray-600">
+                        <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             Skip waiting lines forever
                           </li>
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             Instant confirmations
                           </li>
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             Exclusive member discounts
                           </li>
                         </ul>
@@ -377,22 +377,22 @@ export default function RegisterPage() {
                       <RadioGroupItem value="business" id="business" className="sr-only" />
                       <Label
                         htmlFor="business"
-                        className={`block p-6 border-2 rounded-xl cursor-pointer transition-all ${
+                        className={`block p-4 sm:p-6 border-2 rounded-xl cursor-pointer transition-all ${
                           userType === "business"
                             ? "border-purple-500 bg-purple-50"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                       >
-                        <div className="flex items-center mb-4">
-                          <Building className="w-8 h-8 text-purple-600 mr-3" />
-                          <div>
-                            <h3 className="text-xl font-semibold text-gray-900">I own a Business</h3>
-                            <p className="text-gray-600">Want to manage bookings</p>
+                        <div className="flex items-center mb-3 sm:mb-4">
+                          <Building className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600 mr-2 sm:mr-3 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-900">I own a Business</h3>
+                            <p className="text-sm sm:text-base text-gray-600">Want to manage bookings</p>
                           </div>
                         </div>
-                        <div className="bg-purple-50 p-4 rounded-lg mb-4">
-                          <h4 className="font-semibold text-purple-900 mb-2">🚀 Business Partner Benefits:</h4>
-                          <ul className="space-y-1 text-sm text-purple-800">
+                        <div className="bg-purple-50 p-3 sm:p-4 rounded-lg mb-3 sm:mb-4">
+                          <h4 className="font-semibold text-purple-900 mb-2 text-sm sm:text-base">🚀 Business Partner Benefits:</h4>
+                          <ul className="space-y-1 text-xs sm:text-sm text-purple-800">
                             <li>• <strong>3 months FREE pro subscription</strong> (just for registering!)</li>
                             <li>• <strong>+1 month pro free</strong> for each business you refer</li>
                             <li>• Free premium setup & onboarding</li>
@@ -400,17 +400,17 @@ export default function RegisterPage() {
                             <li>• Dedicated success manager</li>
                           </ul>
                         </div>
-                        <ul className="space-y-2 text-sm text-gray-600">
+                        <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             Reduce no-shows by 60%
                           </li>
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             Smart analytics dashboard
                           </li>
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             Automated customer management
                           </li>
                         </ul>
@@ -423,15 +423,15 @@ export default function RegisterPage() {
 
             {/* Step 2: Contact Information */}
             {currentStep === 2 && (
-              <div className="space-y-6">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Let's get to know you</h2>
-                  <p className="text-gray-600">We'll use this information to personalize your pre-launch experience</p>
+              <div className="space-y-4 sm:space-y-6">
+                <div className="text-center mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Let's get to know you</h2>
+                  <p className="text-sm sm:text-base text-gray-600">We'll use this information to personalize your pre-launch experience</p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name *</Label>
+                    <Label htmlFor="fullName" className="text-sm">Full Name *</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
@@ -439,14 +439,14 @@ export default function RegisterPage() {
                         placeholder="Enter your full name"
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        className="pl-10"
+                        className="pl-10 h-11 sm:h-12"
                         disabled={isLoading}
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address *</Label>
+                    <Label htmlFor="email" className="text-sm">Email Address *</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
@@ -455,14 +455,14 @@ export default function RegisterPage() {
                         placeholder="Enter your email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="pl-10"
+                        className="pl-10 h-11 sm:h-12"
                         disabled={isLoading}
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number *</Label>
+                    <Label htmlFor="phone" className="text-sm">Phone Number *</Label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
@@ -470,20 +470,20 @@ export default function RegisterPage() {
                         placeholder="+91 98765 43210"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="pl-10"
+                        className="pl-10 h-11 sm:h-12"
                         disabled={isLoading}
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="location">Location *</Label>
+                    <Label htmlFor="location" className="text-sm">Location *</Label>
                     <Select
                       value={formData.location}
                       onValueChange={(value) => setFormData({ ...formData, location: value })}
                       disabled={isLoading}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="h-11 sm:h-12">
                         <SelectValue placeholder="Select your city" />
                       </SelectTrigger>
                       <SelectContent>
@@ -497,7 +497,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password *</Label>
+                    <Label htmlFor="password" className="text-sm">Password *</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
@@ -506,7 +506,7 @@ export default function RegisterPage() {
                         placeholder="Create a password"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        className="pl-10 pr-10"
+                        className="pl-10 pr-10 h-11 sm:h-12"
                         disabled={isLoading}
                       />
                       <button
@@ -521,7 +521,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                    <Label htmlFor="confirmPassword" className="text-sm">Confirm Password *</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
@@ -530,7 +530,7 @@ export default function RegisterPage() {
                         placeholder="Confirm your password"
                         value={formData.confirmPassword}
                         onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                        className="pl-10 pr-10"
+                        className="pl-10 pr-10 h-11 sm:h-12"
                         disabled={isLoading}
                       />
                       <button
@@ -546,7 +546,7 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Referral Code Input */}
-                <div className="bg-green-50 p-6 rounded-xl border border-green-200">
+                <div className="bg-green-50 p-4 sm:p-6 rounded-xl border border-green-200">
                   <div className="flex items-center mb-4">
                     <Gift className="w-6 h-6 text-green-600 mr-2" />
                     <h3 className="text-lg font-semibold text-green-900">Have a Referral Code?</h3>
@@ -677,17 +677,17 @@ export default function RegisterPage() {
 
             {/* Step 4: Engagement & Preferences */}
             {currentStep === 4 && (
-              <div className="space-y-6">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Help us serve you better</h2>
-                  <p className="text-gray-600">Your preferences will help us customize your pre-launch experience</p>
+              <div className="space-y-4 sm:space-y-6">
+                <div className="text-center mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Help us serve you better</h2>
+                  <p className="text-sm sm:text-base text-gray-600">Your preferences will help us customize your pre-launch experience</p>
                 </div>
 
-                <div className="space-y-6">
-                  <div className="space-y-4">
-                    <Label>How excited are you about our launch? (1-10)</Label>
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="space-y-3 sm:space-y-4">
+                    <Label className="text-sm">How excited are you about our launch? (1-10)</Label>
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-500">1</span>
+                      <span className="text-xs sm:text-sm text-gray-500">1</span>
                       <input
                         type="range"
                         min="1"
@@ -697,19 +697,19 @@ export default function RegisterPage() {
                         className="flex-1"
                         disabled={isLoading}
                       />
-                      <span className="text-sm text-gray-500">10</span>
-                      <Badge variant="secondary" className="ml-2">
+                      <span className="text-xs sm:text-sm text-gray-500">10</span>
+                      <Badge variant="secondary" className="ml-2 text-xs">
                         {formData.launchInterest}
                       </Badge>
                     </div>
                     <div className="flex justify-center">
                       {Array.from({ length: formData.launchInterest }, (_, i) => (
-                        <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                        <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current" />
                       ))}
                     </div>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="earlyAccessInterest"
@@ -719,7 +719,7 @@ export default function RegisterPage() {
                         }
                         disabled={isLoading}
                       />
-                      <Label htmlFor="earlyAccessInterest" className="text-sm">
+                      <Label htmlFor="earlyAccessInterest" className="text-xs sm:text-sm leading-tight">
                         I want early access to beta features before public launch
                       </Label>
                     </div>
@@ -733,7 +733,7 @@ export default function RegisterPage() {
                         }
                         disabled={isLoading}
                       />
-                      <Label htmlFor="marketingConsent" className="text-sm">
+                      <Label htmlFor="marketingConsent" className="text-xs sm:text-sm leading-tight">
                         Send me launch updates, exclusive offers, and platform news
                       </Label>
                     </div>
@@ -745,7 +745,7 @@ export default function RegisterPage() {
                         onCheckedChange={(checked) => setFormData({ ...formData, whatsappUpdates: checked as boolean })}
                         disabled={isLoading}
                       />
-                      <Label htmlFor="whatsappUpdates" className="text-sm">
+                      <Label htmlFor="whatsappUpdates" className="text-xs sm:text-sm leading-tight">
                         Send me important updates via WhatsApp
                       </Label>
                     </div>
@@ -757,49 +757,49 @@ export default function RegisterPage() {
                         onCheckedChange={(checked) => setFormData({ ...formData, shareOnSocial: checked as boolean })}
                         disabled={isLoading}
                       />
-                      <Label htmlFor="shareOnSocial" className="text-sm">
-                        I'm willing to share BookNow with my network (earn extra rewards!)
+                      <Label htmlFor="shareOnSocial" className="text-xs sm:text-sm leading-tight">
+                        I'm willing to share FastBookr with my network (earn extra rewards!)
                       </Label>
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl">
-                    <h3 className="font-semibold text-gray-900 mb-2">🎉 Your Pre-Launch Benefits!</h3>
-                    <ul className="space-y-2 text-sm text-gray-700">
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 sm:p-6 rounded-xl">
+                    <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">🎉 Your Pre-Launch Benefits!</h3>
+                    <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
                       {userType === "customer" ? (
                         <>
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             50% off your first 10 bookings
                           </li>
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             Lifetime premium features access
                           </li>
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             Priority customer support
                           </li>
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             Exclusive launch event invitations
                           </li>
                         </>
                       ) : (
                         <>
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />3 months free premium subscription
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />3 months free premium subscription
                           </li>
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             Free professional setup and onboarding
                           </li>
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             Featured listing placement
                           </li>
                           <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
                             Dedicated success manager
                           </li>
                         </>
@@ -812,37 +812,37 @@ export default function RegisterPage() {
 
             {/* Step 5: Referral & Sharing */}
             {currentStep === 5 && (
-              <div className="space-y-6">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Share & Earn Rewards</h2>
-                  <p className="text-gray-600">
+              <div className="space-y-4 sm:space-y-6">
+                <div className="text-center mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Share & Earn Rewards</h2>
+                  <p className="text-sm sm:text-base text-gray-600">
                     Your unique referral code is ready! Start earning rewards by inviting friends
                   </p>
                 </div>
 
                 {/* Generated Referral Code */}
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
-                  <div className="text-center mb-6">
-                    <h3 className="text-xl font-semibold text-green-900 mb-2">🎉 Your Referral Code</h3>
-                    <div className="bg-white p-4 rounded-lg border-2 border-green-300 inline-block">
-                      <div className="text-3xl font-bold text-green-600 tracking-wider">{generatedReferralCode}</div>
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 sm:p-6 rounded-xl border border-green-200">
+                  <div className="text-center mb-4 sm:mb-6">
+                    <h3 className="text-lg sm:text-xl font-semibold text-green-900 mb-2">🎉 Your Referral Code</h3>
+                    <div className="bg-white p-3 sm:p-4 rounded-lg border-2 border-green-300 inline-block">
+                      <div className="text-2xl sm:text-3xl font-bold text-green-600 tracking-wider">{generatedReferralCode}</div>
                     </div>
                     <Button
                       onClick={copyReferralCode}
                       variant="outline"
                       size="sm"
-                      className="mt-3 border-green-300 text-green-700 hover:bg-green-100"
+                      className="mt-3 border-green-300 text-green-700 hover:bg-green-100 text-xs sm:text-sm h-9 sm:h-10 px-3 sm:px-4"
                       disabled={isLoading}
                     >
-                      <Copy className="w-4 h-4 mr-2" />
+                      <Copy className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                       Copy Code
                     </Button>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
                     <div>
-                      <h4 className="font-semibold text-green-900 mb-3">💰 Earn for Every Referral:</h4>
-                      <ul className="space-y-2 text-sm text-green-800">
+                      <h4 className="font-semibold text-green-900 mb-3 text-sm sm:text-base">💰 Earn for Every Referral:</h4>
+                      <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-green-800">
                         <li>• ₹500 credit for each friend who joins</li>
                         <li>• Unlock premium features early</li>
                         <li>• Exclusive referrer badges</li>
@@ -851,8 +851,8 @@ export default function RegisterPage() {
                       </ul>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-green-900 mb-3">🎁 Your Friends Get:</h4>
-                      <ul className="space-y-2 text-sm text-green-800">
+                      <h4 className="font-semibold text-green-900 mb-3 text-sm sm:text-base">🎁 Your Friends Get:</h4>
+                      <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-green-800">
                         <li>• ₹500 welcome bonus credit</li>
                         <li>• All pre-launch benefits</li>
                         <li>• Priority early access</li>
@@ -864,63 +864,63 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Social Sharing */}
-                <div className="bg-white p-6 rounded-xl border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-                    <Share2 className="w-5 h-5 inline mr-2" />
+                <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 text-center">
+                    <Share2 className="w-4 h-4 sm:w-5 sm:h-5 inline mr-2" />
                     Share with Your Network
                   </h3>
-                  <p className="text-center text-gray-600 mb-6">
-                    Share BookNow on social media and earn bonus points for each platform!
+                  <p className="text-center text-gray-600 mb-4 sm:mb-6 text-xs sm:text-sm">
+                    Share FastBookr on social media and earn bonus points for each platform!
                   </p>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-4">
                     <Button
                       onClick={() => shareOnSocial("whatsapp")}
-                      className="bg-green-500 hover:bg-green-600 text-white"
+                      className="bg-green-500 hover:bg-green-600 text-white text-xs sm:text-sm h-9 sm:h-10 px-2 sm:px-3"
                       disabled={isLoading}
                     >
-                      <MessageCircle className="w-4 h-4 mr-2" />
+                      <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                       WhatsApp
                     </Button>
                     <Button
                       onClick={() => shareOnSocial("twitter")}
-                      className="bg-blue-400 hover:bg-blue-500 text-white"
+                      className="bg-blue-400 hover:bg-blue-500 text-white text-xs sm:text-sm h-9 sm:h-10 px-2 sm:px-3"
                       disabled={isLoading}
                     >
-                      <Twitter className="w-4 h-4 mr-2" />
+                      <Twitter className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                       Twitter
                     </Button>
                     <Button
                       onClick={() => shareOnSocial("facebook")}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm h-9 sm:h-10 px-2 sm:px-3"
                       disabled={isLoading}
                     >
-                      <Facebook className="w-4 h-4 mr-2" />
+                      <Facebook className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                       Facebook
                     </Button>
                     <Button
                       onClick={() => shareOnSocial("linkedin")}
-                      className="bg-blue-700 hover:bg-blue-800 text-white"
+                      className="bg-blue-700 hover:bg-blue-800 text-white text-xs sm:text-sm h-9 sm:h-10 px-2 sm:px-3"
                       disabled={isLoading}
                     >
-                      <Linkedin className="w-4 h-4 mr-2" />
+                      <Linkedin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                       LinkedIn
                     </Button>
                   </div>
 
-                  <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-800 text-center">
+                  <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-blue-50 rounded-lg">
+                    <p className="text-xs sm:text-sm text-blue-800 text-center">
                       💡 <strong>Pro Tip:</strong> Share on multiple platforms to earn 100 bonus points per platform!
                     </p>
                   </div>
                 </div>
 
                 {/* Final Confirmation */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl">
-                  <h3 className="font-semibold text-gray-900 mb-4 text-center">
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 sm:p-6 rounded-xl">
+                  <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 text-center text-sm sm:text-base">
                     ✅ Ready to Complete Your Registration?
                   </h3>
-                  <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div className="grid gap-3 sm:gap-4 md:grid-cols-2 text-xs sm:text-sm">
                     <div>
                       <h4 className="font-medium text-gray-900 mb-2">What happens next:</h4>
                       <ul className="space-y-1 text-gray-700">
@@ -945,15 +945,16 @@ export default function RegisterPage() {
             )}
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between pt-8 border-t border-gray-200">
+            <div className="flex justify-between pt-6 sm:pt-8 border-t border-gray-200 gap-3">
               <Button
                 variant="outline"
                 onClick={handlePrevious}
                 disabled={!isClient || currentStep === 1 || isLoading}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 h-11 sm:h-12 px-4 sm:px-6 text-sm sm:text-base"
               >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Previous</span>
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Previous</span>
+                <span className="xs:hidden">Back</span>
               </Button>
 
               {currentStep === totalSteps ? (
@@ -970,17 +971,19 @@ export default function RegisterPage() {
                     formData.password !== formData.confirmPassword ||
                     isLoading
                   }
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 flex items-center space-x-2"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 flex items-center space-x-2 h-11 sm:h-12 px-4 sm:px-6 text-sm sm:text-base flex-1 max-w-xs"
                 >
                   {isLoading ? (
                     <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Creating Account...
+                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2"></div>
+                      <span className="hidden sm:inline">Creating Account...</span>
+                      <span className="sm:hidden">Creating...</span>
                     </div>
                   ) : (
                     <>
-                      <span>Complete Pre-Registration</span>
-                      <CheckCircle className="w-4 h-4" />
+                      <span className="hidden sm:inline">Complete Pre-Registration</span>
+                      <span className="sm:hidden">Complete</span>
+                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                     </>
                   )}
                 </Button>
@@ -999,10 +1002,10 @@ export default function RegisterPage() {
                         formData.password !== formData.confirmPassword)) ||
                     isLoading
                   }
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 flex items-center space-x-2"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 flex items-center space-x-2 h-11 sm:h-12 px-4 sm:px-6 text-sm sm:text-base"
                 >
                   <span>Next</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
               )}
             </div>
@@ -1010,26 +1013,26 @@ export default function RegisterPage() {
         </Card>
 
         {/* Trust Indicators */}
-        <div className="mt-8 text-center">
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-gray-500">
-            <div className="flex items-center">
-              <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+        <div className="mt-6 sm:mt-8 text-center">
+          <div className="flex flex-col xs:grid xs:grid-cols-2 sm:flex sm:flex-row items-center justify-center space-y-2 xs:space-y-0 xs:gap-2 sm:space-x-8 text-xs sm:text-sm text-gray-500">
+            <div className="flex items-center justify-center xs:justify-start">
+              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
               100% Free to join
             </div>
-            <div className="flex items-center">
-              <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+            <div className="flex items-center justify-center xs:justify-start">
+              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
               No hidden fees ever
             </div>
-            <div className="flex items-center">
-              <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+            <div className="flex items-center justify-center xs:justify-start">
+              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
               Cancel anytime
             </div>
-            <div className="flex items-center">
-              <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+            <div className="flex items-center justify-center xs:justify-start">
+              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
               Data protected
             </div>
           </div>
-          <p className="mt-4 text-xs text-gray-400">
+          <p className="mt-3 sm:mt-4 text-xs text-gray-400 px-2">
             By registering, you agree to our{" "}
             <Link href="/terms" className="text-blue-600 hover:underline">
               Terms of Service

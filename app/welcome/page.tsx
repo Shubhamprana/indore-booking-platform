@@ -29,8 +29,9 @@ import { useAuth } from "@/hooks/use-auth"
 export default function WelcomePage() {
   const { toast } = useToast()
   const { profile } = useAuth()
-  const [referralCode] = useState(`BN${Math.random().toString(36).substring(2, 8).toUpperCase()}`)
+  const [referralCode, setReferralCode] = useState("")
   const [currentStep, setCurrentStep] = useState(0)
+  const [mounted, setMounted] = useState(false)
 
   const nextSteps = [
     {
@@ -64,6 +65,10 @@ export default function WelcomePage() {
   ]
 
   useEffect(() => {
+    // Generate referral code on client side to prevent hydration mismatch
+    setReferralCode(`BN${Math.random().toString(36).substring(2, 8).toUpperCase()}`)
+    setMounted(true)
+    
     // Trigger confetti animation on page load
     confetti({
       particleCount: 100,
@@ -73,6 +78,7 @@ export default function WelcomePage() {
   }, [])
 
   const copyReferralCode = () => {
+    if (!referralCode) return
     navigator.clipboard.writeText(referralCode)
     toast({
       title: "Copied!",
@@ -81,6 +87,7 @@ export default function WelcomePage() {
   }
 
   const shareOnSocial = (platform: string) => {
+    if (!referralCode) return
     const message = `I just joined the FastBookr pre-launch! 🚀 Skip the wait and book instantly when it launches. Join me with my referral code: ${referralCode}`
     const url = `https://booknow.com/register?ref=${referralCode}`
 
@@ -155,11 +162,25 @@ export default function WelcomePage() {
 
             <div className="bg-white p-6 rounded-xl border-2 border-green-300 mb-6">
               <div className="text-center">
-                <div className="text-4xl font-bold text-green-600 tracking-wider mb-4">{referralCode}</div>
-                <Button onClick={copyReferralCode} className="bg-green-600 hover:bg-green-700 text-white">
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copy Referral Code
-                </Button>
+                {referralCode ? (
+                  <>
+                    <div className="text-4xl font-bold text-green-600 tracking-wider mb-4">{referralCode}</div>
+                    <Button onClick={copyReferralCode} className="bg-green-600 hover:bg-green-700 text-white">
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy Referral Code
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-4xl font-bold text-green-600 tracking-wider mb-4">
+                      <div className="animate-pulse bg-green-200 h-10 w-32 rounded mx-auto"></div>
+                    </div>
+                    <Button disabled className="bg-gray-400 text-white cursor-not-allowed">
+                      <Copy className="w-4 h-4 mr-2" />
+                      Generating Code...
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -189,20 +210,33 @@ export default function WelcomePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Button
                   onClick={() => shareOnSocial("whatsapp")}
-                  className="bg-green-500 hover:bg-green-600 text-white"
+                  disabled={!referralCode}
+                  className="bg-green-500 hover:bg-green-600 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />
                   WhatsApp
                 </Button>
-                <Button onClick={() => shareOnSocial("twitter")} className="bg-blue-400 hover:bg-blue-500 text-white">
+                <Button 
+                  onClick={() => shareOnSocial("twitter")} 
+                  disabled={!referralCode}
+                  className="bg-blue-400 hover:bg-blue-500 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
                   <Twitter className="w-4 h-4 mr-2" />
                   Twitter
                 </Button>
-                <Button onClick={() => shareOnSocial("facebook")} className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button 
+                  onClick={() => shareOnSocial("facebook")} 
+                  disabled={!referralCode}
+                  className="bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
                   <Facebook className="w-4 h-4 mr-2" />
                   Facebook
                 </Button>
-                <Button onClick={() => shareOnSocial("linkedin")} className="bg-blue-700 hover:bg-blue-800 text-white">
+                <Button 
+                  onClick={() => shareOnSocial("linkedin")} 
+                  disabled={!referralCode}
+                  className="bg-blue-700 hover:bg-blue-800 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
                   <Linkedin className="w-4 h-4 mr-2" />
                   LinkedIn
                 </Button>

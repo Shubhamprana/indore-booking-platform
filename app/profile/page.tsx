@@ -362,134 +362,139 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 sm:py-6 md:py-8">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3 xs:gap-0">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-white" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                <Calendar className="w-3 h-3 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-xl font-bold">FastBookr</span>
-              <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+              <span className="text-lg sm:text-xl font-bold">FastBookr</span>
+              <Badge variant="secondary" className="bg-white/20 text-white border-white/30 text-xs px-1 py-0.5 sm:px-2 sm:py-1">
                 Pre-Launch
               </Badge>
             </Link>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 w-full xs:w-auto">
               <Button 
                 variant="outline" 
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                size="sm"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
                 onClick={refreshStats}
               >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                Refresh Stats
+                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden xs:inline">Refresh Stats</span>
+                <span className="xs:hidden">Refresh</span>
               </Button>
               <Link href="/">
-                <Button variant="outline" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3">
                   Home
                 </Button>
               </Link>
               {profile?.user_type === 'business' && (
                 <Link href="/business/dashboard">
-                  <Button variant="outline" className="border-blue/30 text-white hover:bg-white/10">
-                    Dashboard
+                  <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3">
+                    <span className="hidden sm:inline">Dashboard</span>
+                    <span className="sm:hidden">Dash</span>
                   </Button>
                 </Link>
               )}
               <Button 
                 variant="outline" 
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                size="sm"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
                 onClick={async () => {
                   await signOut()
                   window.location.href = "/login"
                 }}
               >
-                Sign Out
+                <span className="hidden xs:inline">Sign Out</span>
+                <span className="xs:hidden">Out</span>
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 md:py-8">
+        <div className="grid gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-3">
           {/* Profile Sidebar */}
           <div className="lg:col-span-1">
             <Card>
-              <CardContent className="p-6">
-                <div className="text-center mb-6">
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-center mb-4 sm:mb-6">
                   <div className="relative inline-block">
-                    <Avatar className="w-24 h-24 mx-auto">
+                    <Avatar className="w-20 h-20 sm:w-24 sm:h-24 mx-auto">
                       <AvatarImage src={profileData.profileImage || "/placeholder.svg"} alt={profileData.fullName} />
-                      <AvatarFallback className="text-2xl">
+                      <AvatarFallback className="text-lg sm:text-2xl">
                         {profileData.fullName
                           .split(" ")
                           .map((n) => n[0])
                           .join("")}
                       </AvatarFallback>
                     </Avatar>
-                    <Button size="sm" className="absolute bottom-0 right-0 rounded-full w-8 h-8 p-0" variant="outline">
-                      <Camera className="w-4 h-4" />
+                    <Button size="sm" className="absolute bottom-0 right-0 rounded-full w-7 h-7 sm:w-8 sm:h-8 p-0" variant="outline">
+                      <Camera className="w-3 h-3 sm:w-4 sm:h-4" />
                     </Button>
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900 mt-4">{profileData.fullName}</h2>
-                  <p className="text-gray-600">{profileData.email}</p>
-                  <Badge className="mt-2 bg-green-100 text-green-800">Early Adopter #{userStats?.position_rank || 0}</Badge>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mt-3 sm:mt-4">{profileData.fullName}</h2>
+                  <p className="text-sm sm:text-base text-gray-600">{profileData.email}</p>
+                  <Badge className="mt-2 bg-green-100 text-green-800 text-xs">Early Adopter #{userStats?.position_rank || 0}</Badge>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center text-gray-600">
-                    <Phone className="w-4 h-4 mr-3" />
-                    <span>{profileData.phone}</span>
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="flex items-center text-gray-600 text-sm sm:text-base">
+                    <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-2 sm:mr-3 flex-shrink-0" />
+                    <span className="truncate">{profileData.phone}</span>
                   </div>
-                  <div className="flex items-center text-gray-600">
-                    <MapPin className="w-4 h-4 mr-3" />
-                    <span>{profileData.location}</span>
+                  <div className="flex items-center text-gray-600 text-sm sm:text-base">
+                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2 sm:mr-3 flex-shrink-0" />
+                    <span className="truncate">{profileData.location}</span>
                   </div>
-                  <div className="flex items-center text-gray-600">
-                    <Calendar className="w-4 h-4 mr-3" />
+                  <div className="flex items-center text-gray-600 text-sm sm:text-base">
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-2 sm:mr-3 flex-shrink-0" />
                     <span>Joined {new Date(profileData.joinDate).toLocaleDateString()}</span>
                   </div>
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="font-semibold text-gray-900 mb-3">Quick Stats</h3>
-                  <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
+                  <h3 className="font-semibold text-gray-900 mb-3 text-sm sm:text-base">Quick Stats</h3>
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-blue-600">{userStats?.successful_referrals || 0}</div>
-                      <div className="text-sm text-gray-600">Referrals</div>
+                      <div className="text-lg sm:text-2xl font-bold text-blue-600">{userStats?.successful_referrals || 0}</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Referrals</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-green-600">₹{userStats?.credits_earned?.toLocaleString() || 0}</div>
-                      <div className="text-sm text-gray-600">Credits</div>
+                      <div className="text-lg sm:text-2xl font-bold text-green-600">₹{userStats?.credits_earned?.toLocaleString() || 0}</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Credits</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-purple-600">{userStats?.total_points?.toLocaleString() || 0}</div>
-                      <div className="text-sm text-gray-600">Points</div>
+                      <div className="text-lg sm:text-2xl font-bold text-purple-600">{userStats?.total_points?.toLocaleString() || 0}</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Points</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-yellow-600">{achievements.length}</div>
-                      <div className="text-sm text-gray-600">Achievements</div>
+                      <div className="text-lg sm:text-2xl font-bold text-yellow-600">{achievements.length}</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Achievements</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-indigo-600">{followStats.followers_count || 0}</div>
-                      <div className="text-sm text-gray-600">Followers</div>
+                      <div className="text-lg sm:text-2xl font-bold text-indigo-600">{followStats.followers_count || 0}</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Followers</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-pink-600">{followStats.following_count || 0}</div>
-                      <div className="text-sm text-gray-600">Following</div>
+                      <div className="text-lg sm:text-2xl font-bold text-pink-600">{followStats.following_count || 0}</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Following</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-6 space-y-3">
+                <div className="mt-4 sm:mt-6 space-y-3">
                   {!isEditing ? (
-                    <Button onClick={() => setIsEditing(true)} className="w-full">
-                      <Edit className="w-4 h-4 mr-2" />
+                    <Button onClick={() => setIsEditing(true)} className="w-full h-10 sm:h-11 text-sm sm:text-base">
+                      <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                       Edit Profile
                     </Button>
                   ) : (
-                    <Button onClick={handleSave} className="w-full bg-green-600 hover:bg-green-700">
-                      <Save className="w-4 h-4 mr-2" />
+                    <Button onClick={handleSave} className="w-full bg-green-600 hover:bg-green-700 h-10 sm:h-11 text-sm sm:text-base">
+                      <Save className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                       Save Changes
                     </Button>
                   )}
@@ -498,33 +503,33 @@ export default function ProfilePage() {
             </Card>
 
             {/* Referral Card */}
-            <Card className="mt-6">
-              <CardContent className="p-6">
+            <Card className="mt-4 sm:mt-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="text-center mb-4">
-                  <Gift className="w-10 h-10 text-purple-600 mx-auto mb-2" />
-                  <h3 className="text-lg font-semibold text-gray-900">Your Referral Code</h3>
-                  <p className="text-sm text-gray-600 mb-4">Earn ₹50 credits every 2 friends you refer</p>
-                  <div className="bg-purple-50 p-3 rounded-lg border border-purple-200 flex items-center justify-between">
-                    <div className="text-xl font-bold text-purple-700">{profileData.referralCode}</div>
-                    <Button variant="ghost" size="sm" onClick={copyReferralCode}>
-                      <Copy className="w-4 h-4" />
+                  <Gift className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600 mx-auto mb-2" />
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Your Referral Code</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">Earn ₹50 credits every 2 friends you refer</p>
+                  <div className="bg-purple-50 p-2 sm:p-3 rounded-lg border border-purple-200 flex items-center justify-between">
+                    <div className="text-lg sm:text-xl font-bold text-purple-700">{profileData.referralCode}</div>
+                    <Button variant="ghost" size="sm" onClick={copyReferralCode} className="h-8 w-8 p-0">
+                      <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                     </Button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 text-center mt-6">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 text-center mt-4 sm:mt-6">
                   <div>
-                    <div className="text-2xl font-bold text-blue-600">{userStats?.successful_referrals || 0}</div>
-                    <div className="text-sm text-gray-600">Friends Joined</div>
+                    <div className="text-lg sm:text-2xl font-bold text-blue-600">{userStats?.successful_referrals || 0}</div>
+                    <div className="text-xs sm:text-sm text-gray-600">Friends Joined</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-green-600">₹{userStats?.credits_earned?.toLocaleString() || 0}</div>
-                    <div className="text-sm text-gray-600">Credits Earned</div>
+                    <div className="text-lg sm:text-2xl font-bold text-green-600">₹{userStats?.credits_earned?.toLocaleString() || 0}</div>
+                    <div className="text-xs sm:text-sm text-gray-600">Credits Earned</div>
                   </div>
                 </div>
 
                 {/* Progress towards milestone */}
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="mt-3 sm:mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                   {(() => {
                     const totalReferrals = userStats?.successful_referrals || 0
                     const currentMilestone = Math.ceil(totalReferrals / 2) || 1
@@ -534,10 +539,10 @@ export default function ProfilePage() {
                     return (
                       <>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-blue-900">
+                          <span className="text-xs sm:text-sm font-medium text-blue-900">
                             Milestone {currentMilestone} Progress
                           </span>
-                          <span className="text-sm text-blue-700">{progressInMilestone}/2</span>
+                          <span className="text-xs sm:text-sm text-blue-700">{progressInMilestone}/2</span>
                         </div>
                         <div className="w-full bg-blue-200 rounded-full h-2">
                           <div 
@@ -559,16 +564,21 @@ export default function ProfilePage() {
                   })()}
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h4 className="font-medium text-gray-900 mb-3">Share Your Code</h4>
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
+                  <h4 className="font-medium text-gray-900 mb-3 text-sm sm:text-base">Share Your Code</h4>
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
                     <Button
-                      className="bg-green-500 hover:bg-green-600"
+                      size="sm"
+                      className="bg-green-500 hover:bg-green-600 text-xs sm:text-sm h-9 sm:h-10"
                       onClick={() => shareOnSocial("whatsapp")}
                     >
                       WhatsApp
                     </Button>
-                    <Button className="bg-blue-500 hover:bg-blue-600" onClick={() => shareOnSocial("twitter")}>
+                    <Button 
+                      size="sm" 
+                      className="bg-blue-500 hover:bg-blue-600 text-xs sm:text-sm h-9 sm:h-10" 
+                      onClick={() => shareOnSocial("twitter")}
+                    >
                       Twitter
                     </Button>
                   </div>
@@ -580,86 +590,90 @@ export default function ProfilePage() {
           {/* Main Content */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="profile">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="profile">Profile</TabsTrigger>
-                <TabsTrigger value="referrals">Referrals</TabsTrigger>
-                <TabsTrigger value="achievements">Achievements</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 h-9 sm:h-10">
+                <TabsTrigger value="profile" className="text-xs sm:text-sm">Profile</TabsTrigger>
+                <TabsTrigger value="referrals" className="text-xs sm:text-sm">Referrals</TabsTrigger>
+                <TabsTrigger value="achievements" className="text-xs sm:text-sm">Achievements</TabsTrigger>
               </TabsList>
 
               {/* Profile Tab */}
-              <TabsContent value="profile" className="space-y-6">
+              <TabsContent value="profile" className="space-y-4 sm:space-y-6">
                   <Card>
-                  <CardHeader>
-                    <CardTitle>Profile Information</CardTitle>
+                  <CardHeader className="pb-3 sm:pb-6">
+                    <CardTitle className="text-lg sm:text-xl">Profile Information</CardTitle>
                   </CardHeader>
                   <CardContent>
                     {isEditing ? (
-                      <div className="space-y-6">
-                        <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-4 sm:space-y-6">
+                        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
                           <div className="space-y-2">
-                            <Label htmlFor="fullName">Full Name</Label>
+                            <Label htmlFor="fullName" className="text-sm">Full Name</Label>
                             <Input
                               id="fullName"
                               value={profileData.fullName}
                               onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
+                              className="h-10 sm:h-11"
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" value={profileData.email} disabled />
+                            <Label htmlFor="email" className="text-sm">Email Address</Label>
+                            <Input id="email" value={profileData.email} disabled className="h-10 sm:h-11" />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="phone">Phone Number</Label>
+                            <Label htmlFor="phone" className="text-sm">Phone Number</Label>
                             <Input
                               id="phone"
                               value={profileData.phone}
                               onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                              className="h-10 sm:h-11"
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="location">Location</Label>
+                            <Label htmlFor="location" className="text-sm">Location</Label>
                             <Input
                               id="location"
                               value={profileData.location}
                               onChange={(e) => setProfileData({ ...profileData, location: e.target.value })}
+                              className="h-10 sm:h-11"
                             />
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="bio">Bio</Label>
+                          <Label htmlFor="bio" className="text-sm">Bio</Label>
                           <Textarea
                             id="bio"
                             value={profileData.bio}
                             onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
                             placeholder="Tell us about yourself..."
                             rows={4}
+                            className="resize-none"
                           />
                         </div>
                       </div>
                     ) : (
-                      <div className="space-y-6">
-                        <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-4 sm:space-y-6">
+                        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
                           <div className="space-y-1">
-                            <h4 className="text-sm font-medium text-gray-500">Full Name</h4>
-                            <p className="text-gray-900">{profileData.fullName}</p>
+                            <h4 className="text-xs sm:text-sm font-medium text-gray-500">Full Name</h4>
+                            <p className="text-sm sm:text-base text-gray-900">{profileData.fullName}</p>
                           </div>
                           <div className="space-y-1">
-                            <h4 className="text-sm font-medium text-gray-500">Email Address</h4>
-                            <p className="text-gray-900">{profileData.email}</p>
+                            <h4 className="text-xs sm:text-sm font-medium text-gray-500">Email Address</h4>
+                            <p className="text-sm sm:text-base text-gray-900 truncate">{profileData.email}</p>
                           </div>
                           <div className="space-y-1">
-                            <h4 className="text-sm font-medium text-gray-500">Phone Number</h4>
-                            <p className="text-gray-900">{profileData.phone || "Not provided"}</p>
+                            <h4 className="text-xs sm:text-sm font-medium text-gray-500">Phone Number</h4>
+                            <p className="text-sm sm:text-base text-gray-900">{profileData.phone || "Not provided"}</p>
                           </div>
                           <div className="space-y-1">
-                            <h4 className="text-sm font-medium text-gray-500">Location</h4>
-                            <p className="text-gray-900">{profileData.location}</p>
+                            <h4 className="text-xs sm:text-sm font-medium text-gray-500">Location</h4>
+                            <p className="text-sm sm:text-base text-gray-900">{profileData.location}</p>
                           </div>
                         </div>
                         {profileData.bio && (
                           <div className="space-y-1">
-                            <h4 className="text-sm font-medium text-gray-500">Bio</h4>
-                            <p className="text-gray-900 whitespace-pre-line">{profileData.bio}</p>
+                            <h4 className="text-xs sm:text-sm font-medium text-gray-500">Bio</h4>
+                            <p className="text-sm sm:text-base text-gray-900 whitespace-pre-line">{profileData.bio}</p>
                           </div>
                         )}
                       </div>
@@ -668,41 +682,41 @@ export default function ProfilePage() {
                   </Card>
 
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
+                  <CardHeader className="pb-3 sm:pb-6">
+                    <CardTitle className="flex items-center text-lg sm:text-xl">
+                      <Trophy className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-yellow-500" />
                       Recent Achievements
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       {achievements.slice(0, 3).map((achievement) => (
-                        <div key={achievement.id} className="flex items-start p-3 bg-gray-50 rounded-lg">
-                          <div className="bg-yellow-100 p-2 rounded-lg mr-4 text-xl">{achievement.icon}</div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-900">{achievement.name}</h4>
-                            <p className="text-sm text-gray-600">{achievement.description}</p>
+                        <div key={achievement.id} className="flex items-start p-2 sm:p-3 bg-gray-50 rounded-lg">
+                          <div className="bg-yellow-100 p-1 sm:p-2 rounded-lg mr-3 sm:mr-4 text-base sm:text-xl flex-shrink-0">{achievement.icon}</div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-gray-900 text-sm sm:text-base">{achievement.name}</h4>
+                            <p className="text-xs sm:text-sm text-gray-600">{achievement.description}</p>
                             <p className="text-xs text-gray-500 mt-1">
                               {achievement.unlocked
                                 ? `Unlocked ${achievement.unlockedAt ? new Date(achievement.unlockedAt).toLocaleDateString() : ''}`
                                 : `In progress: ${achievement.progress || 0}/${achievement.target || 0}`}
                             </p>
                           </div>
-                          <div className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded">
+                          <div className="bg-yellow-100 text-yellow-800 text-xs font-medium px-1 py-0.5 sm:px-2 sm:py-1 rounded flex-shrink-0">
                             +{achievement.points} pts
                           </div>
                         </div>
                       ))}
                       {achievements.length === 0 && (
-                        <div className="text-center py-6">
-                          <Trophy className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                          <h3 className="text-lg font-medium text-gray-600">No achievements yet</h3>
-                          <p className="text-gray-500 mt-1">Complete actions to earn achievements</p>
+                        <div className="text-center py-4 sm:py-6">
+                          <Trophy className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
+                          <h3 className="text-base sm:text-lg font-medium text-gray-600">No achievements yet</h3>
+                          <p className="text-sm sm:text-base text-gray-500 mt-1">Complete actions to earn achievements</p>
                         </div>
                       )}
                       {achievements.length > 3 && (
                         <div className="text-center mt-2">
-                          <Button variant="link" onClick={() => {
+                          <Button variant="link" size="sm" className="text-xs sm:text-sm" onClick={() => {
                             const tabElement = document.querySelector('[data-value="achievements"]');
                             if (tabElement instanceof HTMLElement) {
                               tabElement.click();
@@ -717,33 +731,33 @@ export default function ProfilePage() {
                 </Card>
 
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Clock className="w-5 h-5 mr-2 text-blue-500" />
+                  <CardHeader className="pb-3 sm:pb-6">
+                    <CardTitle className="flex items-center text-lg sm:text-xl">
+                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-500" />
                       Recent Activity
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       {recentActivity.map((activity) => (
-                        <div key={activity.id} className="flex items-start p-3 bg-gray-50 rounded-lg">
-                          <div className="bg-blue-50 p-2 rounded-full mr-4">{getActivityIcon(activity.activity_type)}</div>
-                          <div className="flex-1">
-                            <p className="text-gray-900">{activity.description}</p>
+                        <div key={activity.id} className="flex items-start p-2 sm:p-3 bg-gray-50 rounded-lg">
+                          <div className="bg-blue-50 p-1 sm:p-2 rounded-full mr-3 sm:mr-4 flex-shrink-0">{getActivityIcon(activity.activity_type)}</div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm sm:text-base text-gray-900">{activity.description}</p>
                             <p className="text-xs text-gray-500 mt-1">{formatTimeAgo(activity.created_at)}</p>
                             </div>
                           {activity.reward_points > 0 && (
-                            <div className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">
+                            <div className="bg-green-100 text-green-800 text-xs font-medium px-1 py-0.5 sm:px-2 sm:py-1 rounded flex-shrink-0">
                               +{activity.reward_points} pts
                             </div>
                           )}
                           </div>
                       ))}
                       {recentActivity.length === 0 && (
-                        <div className="text-center py-6">
-                          <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                          <h3 className="text-lg font-medium text-gray-600">No recent activity</h3>
-                          <p className="text-gray-500 mt-1">Your actions will appear here</p>
+                        <div className="text-center py-4 sm:py-6">
+                          <Clock className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
+                          <h3 className="text-base sm:text-lg font-medium text-gray-600">No recent activity</h3>
+                          <p className="text-sm sm:text-base text-gray-500 mt-1">Your actions will appear here</p>
                         </div>
                       )}
                     </div>
@@ -752,77 +766,92 @@ export default function ProfilePage() {
               </TabsContent>
 
               {/* Referrals Tab */}
-              <TabsContent value="referrals" className="space-y-6">
+              <TabsContent value="referrals" className="space-y-4 sm:space-y-6">
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Referral Program</CardTitle>
+                  <CardHeader className="pb-3 sm:pb-6">
+                    <CardTitle className="text-lg sm:text-xl">Referral Program</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl mb-6 border border-purple-100">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-3">How it works</h3>
+                    <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 sm:p-6 rounded-xl mb-4 sm:mb-6 border border-purple-100">
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3">How it works</h3>
                       <ul className="space-y-3">
                         <li className="flex items-start">
-                          <div className="bg-purple-100 text-purple-800 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                          <div className="bg-purple-100 text-purple-800 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center mr-2 sm:mr-3 mt-0.5 flex-shrink-0 text-xs sm:text-sm">
                             1
                           </div>
-                          <div>
-                            <p className="text-gray-800">Share your unique referral code with friends</p>
-                            <p className="text-sm text-gray-600">Use the social buttons below or copy your code</p>
+                          <div className="min-w-0">
+                            <p className="text-sm sm:text-base text-gray-800">Share your unique referral code with friends</p>
+                            <p className="text-xs sm:text-sm text-gray-600">Use the social buttons below or copy your code</p>
                           </div>
                         </li>
                         <li className="flex items-start">
-                          <div className="bg-purple-100 text-purple-800 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                          <div className="bg-purple-100 text-purple-800 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center mr-2 sm:mr-3 mt-0.5 flex-shrink-0 text-xs sm:text-sm">
                             2
                           </div>
-                          <div>
-                            <p className="text-gray-800">Friends sign up using your code</p>
-                            <p className="text-sm text-gray-600">They enter your code during registration</p>
+                          <div className="min-w-0">
+                            <p className="text-sm sm:text-base text-gray-800">Friends sign up using your code</p>
+                            <p className="text-xs sm:text-sm text-gray-600">They enter your code during registration</p>
                           </div>
                         </li>
                         <li className="flex items-start">
-                          <div className="bg-purple-100 text-purple-800 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                          <div className="bg-purple-100 text-purple-800 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center mr-2 sm:mr-3 mt-0.5 flex-shrink-0 text-xs sm:text-sm">
                             3
                           </div>
-                          <div>
-                            <p className="text-gray-800">You both get rewarded!</p>
-                            <p className="text-sm text-gray-600">Earn ₹50 credits every 2 friends you refer (they get ₹25 each)</p>
+                          <div className="min-w-0">
+                            <p className="text-sm sm:text-base text-gray-800">You both get rewarded!</p>
+                            <p className="text-xs sm:text-sm text-gray-600">Earn ₹50 credits every 2 friends you refer (they get ₹25 each)</p>
                           </div>
                         </li>
                       </ul>
                     </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-3">Your Referral Link</h3>
-                        <div className="flex items-center">
+                        <h3 className="font-semibold text-gray-900 mb-3 text-sm sm:text-base">Your Referral Link</h3>
+                        <div className="flex flex-col xs:flex-row gap-2">
                         <Input
                             value={`${typeof window !== "undefined" ? window.location.origin : ""}/register?ref=${
                               profileData.referralCode
                             }`}
                             readOnly
+                            className="text-xs sm:text-sm h-9 sm:h-10 flex-1"
                           />
-                          <Button variant="outline" size="sm" className="ml-2" onClick={copyReferralLink}>
-                            <Copy className="w-4 h-4" />
+                          <Button variant="outline" size="sm" className="h-9 sm:h-10 px-3" onClick={copyReferralLink}>
+                            <Copy className="w-3 h-3 sm:w-4 sm:h-4 mr-1 xs:mr-2" />
+                            <span className="hidden xs:inline">Copy</span>
                           </Button>
                         </div>
                       </div>
 
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-3">Share on Social Media</h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <h3 className="font-semibold text-gray-900 mb-3 text-sm sm:text-base">Share on Social Media</h3>
+                        <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4">
                           <Button
-                            className="bg-green-500 hover:bg-green-600"
+                            size="sm"
+                            className="bg-green-500 hover:bg-green-600 text-xs sm:text-sm h-9 sm:h-10"
                             onClick={() => shareOnSocial("whatsapp")}
                           >
                             WhatsApp
                           </Button>
-                          <Button className="bg-blue-400 hover:bg-blue-500" onClick={() => shareOnSocial("twitter")}>
+                          <Button 
+                            size="sm" 
+                            className="bg-blue-400 hover:bg-blue-500 text-xs sm:text-sm h-9 sm:h-10" 
+                            onClick={() => shareOnSocial("twitter")}
+                          >
                             Twitter
                           </Button>
-                          <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => shareOnSocial("facebook")}>
+                          <Button 
+                            size="sm" 
+                            className="bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm h-9 sm:h-10" 
+                            onClick={() => shareOnSocial("facebook")}
+                          >
                             Facebook
                           </Button>
-                          <Button className="bg-blue-700 hover:bg-blue-800" onClick={() => shareOnSocial("linkedin")}>
+                          <Button 
+                            size="sm" 
+                            className="bg-blue-700 hover:bg-blue-800 text-xs sm:text-sm h-9 sm:h-10" 
+                            onClick={() => shareOnSocial("linkedin")}
+                          >
                             LinkedIn
                           </Button>
                         </div>
@@ -830,37 +859,37 @@ export default function ProfilePage() {
 
                       <div>
                         <div className="flex items-center justify-between mb-3">
-                          <h3 className="font-semibold text-gray-900">Your Referrals</h3>
-                          <Badge variant="outline" className="font-normal">
+                          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Your Referrals</h3>
+                          <Badge variant="outline" className="font-normal text-xs">
                             {referrals.length} Total
                           </Badge>
                         </div>
                         {referrals.length > 0 ? (
-                          <div className="space-y-3">
+                          <div className="space-y-2 sm:space-y-3">
                             {referrals.map((referral) => (
                               <div
                                 key={referral.id}
-                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg"
                               >
-                                <div className="flex items-center">
-                                  <Avatar className="w-10 h-10 mr-3">
-                                    <AvatarFallback className="bg-blue-100 text-blue-600">
+                                <div className="flex items-center min-w-0 flex-1">
+                                  <Avatar className="w-8 h-8 sm:w-10 sm:h-10 mr-2 sm:mr-3 flex-shrink-0">
+                                    <AvatarFallback className="bg-blue-100 text-blue-600 text-xs sm:text-sm">
                                       {referral.referred_user_id.substring(0, 2).toUpperCase()}
                                     </AvatarFallback>
                                   </Avatar>
-                                  <div>
-                                    <p className="font-medium text-gray-900">User {referral.referred_user_id.substring(0, 8)}</p>
+                                  <div className="min-w-0">
+                                    <p className="font-medium text-gray-900 text-sm sm:text-base truncate">User {referral.referred_user_id.substring(0, 8)}</p>
                                     <p className="text-xs text-gray-500">
                                       Joined {new Date(referral.created_at).toLocaleDateString()}
                                     </p>
                                   </div>
                                 </div>
                                 <Badge
-                                  className={
+                                  className={`text-xs flex-shrink-0 ml-2 ${
                                     referral.status === "completed"
                                       ? "bg-green-100 text-green-800"
                                       : "bg-yellow-100 text-yellow-800"
-                                  }
+                                  }`}
                                 >
                                   {referral.status}
                                 </Badge>
@@ -868,11 +897,11 @@ export default function ProfilePage() {
                             ))}
                           </div>
                         ) : (
-                          <div className="text-center py-8 bg-gray-50 rounded-lg">
-                            <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                            <h3 className="text-lg font-medium text-gray-600">No referrals yet</h3>
-                            <p className="text-gray-500 mt-1 mb-4">Share your code to start earning rewards</p>
-                            <Button onClick={() => shareOnSocial("whatsapp")}>Share Now</Button>
+                          <div className="text-center py-6 sm:py-8 bg-gray-50 rounded-lg">
+                            <Users className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
+                            <h3 className="text-base sm:text-lg font-medium text-gray-600">No referrals yet</h3>
+                            <p className="text-sm sm:text-base text-gray-500 mt-1 mb-4">Share your code to start earning rewards</p>
+                            <Button size="sm" className="h-9 sm:h-10 text-sm" onClick={() => shareOnSocial("whatsapp")}>Share Now</Button>
                       </div>
                         )}
                       </div>
@@ -882,45 +911,45 @@ export default function ProfilePage() {
               </TabsContent>
 
               {/* Achievements Tab */}
-              <TabsContent value="achievements" className="space-y-6">
+              <TabsContent value="achievements" className="space-y-4 sm:space-y-6">
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
+                  <CardHeader className="pb-3 sm:pb-6">
+                    <CardTitle className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2">
                       <div className="flex items-center">
-                        <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
-                        Your Achievements
+                        <Trophy className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-yellow-500" />
+                        <span className="text-lg sm:text-xl">Your Achievements</span>
                       </div>
-                      <div className="text-sm font-normal text-gray-500">
+                      <div className="text-xs sm:text-sm font-normal text-gray-500">
                         {achievements.filter(a => a.unlocked).length}/{achievements.length} Unlocked
                       </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       {/* Unlocked Achievements */}
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-4">Unlocked</h3>
-                        <div className="grid gap-4">
+                        <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">Unlocked</h3>
+                        <div className="grid gap-3 sm:gap-4">
                           {achievements.filter(a => a.unlocked).map((achievement) => (
-                            <div key={achievement.id} className="flex items-start p-4 bg-yellow-50 border border-yellow-100 rounded-lg">
-                              <div className="text-3xl mr-4">{achievement.icon}</div>
-                              <div className="flex-1">
-                                <div className="flex items-center">
-                                  <h4 className="font-semibold text-gray-900">{achievement.name}</h4>
-                                  <Badge className="ml-2 bg-yellow-100 text-yellow-800">+{achievement.points} pts</Badge>
+                            <div key={achievement.id} className="flex items-start p-3 sm:p-4 bg-yellow-50 border border-yellow-100 rounded-lg">
+                              <div className="text-2xl sm:text-3xl mr-3 sm:mr-4 flex-shrink-0">{achievement.icon}</div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-0">
+                                  <h4 className="font-semibold text-gray-900 text-sm sm:text-base">{achievement.name}</h4>
+                                  <Badge className="xs:ml-2 bg-yellow-100 text-yellow-800 text-xs w-fit">+{achievement.points} pts</Badge>
                                 </div>
-                                <p className="text-sm text-gray-600 mt-1">{achievement.description}</p>
+                                <p className="text-xs sm:text-sm text-gray-600 mt-1">{achievement.description}</p>
                                 <p className="text-xs text-gray-500 mt-1">Unlocked {achievement.unlockedAt ? new Date(achievement.unlockedAt).toLocaleDateString() : ""}</p>
                               </div>
-                              <div>
-                                <CheckCircle className="w-6 h-6 text-green-500" />
+                              <div className="flex-shrink-0">
+                                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-500" />
                               </div>
                             </div>
                           ))}
 
                           {achievements.filter(a => a.unlocked).length === 0 && (
-                            <div className="text-center py-6">
-                              <p className="text-gray-500">Complete challenges to unlock achievements</p>
+                            <div className="text-center py-4 sm:py-6">
+                              <p className="text-sm sm:text-base text-gray-500">Complete challenges to unlock achievements</p>
                           </div>
                           )}
                       </div>
@@ -928,17 +957,17 @@ export default function ProfilePage() {
 
                       {/* In Progress Achievements */}
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-4">In Progress</h3>
-                        <div className="grid gap-4">
+                        <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">In Progress</h3>
+                        <div className="grid gap-3 sm:gap-4">
                           {achievements.filter(a => !a.unlocked).map((achievement) => (
-                            <div key={achievement.id} className="flex items-start p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                              <div className="text-3xl mr-4">{achievement.icon}</div>
-                              <div className="flex-1">
-                                <div className="flex items-center">
-                                  <h4 className="font-semibold text-gray-900">{achievement.name}</h4>
-                                  <Badge className="ml-2 bg-gray-200 text-gray-700">+{achievement.points} pts</Badge>
+                            <div key={achievement.id} className="flex items-start p-3 sm:p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                              <div className="text-2xl sm:text-3xl mr-3 sm:mr-4 flex-shrink-0">{achievement.icon}</div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-0">
+                                  <h4 className="font-semibold text-gray-900 text-sm sm:text-base">{achievement.name}</h4>
+                                  <Badge className="xs:ml-2 bg-gray-200 text-gray-700 text-xs w-fit">+{achievement.points} pts</Badge>
                                 </div>
-                                <p className="text-sm text-gray-600 mt-1">{achievement.description}</p>
+                                <p className="text-xs sm:text-sm text-gray-600 mt-1">{achievement.description}</p>
                                 <div className="mt-2">
                                   <div className="w-full bg-gray-200 rounded-full h-2">
                                     <div
@@ -960,8 +989,8 @@ export default function ProfilePage() {
                           ))}
 
                           {achievements.filter(a => !a.unlocked).length === 0 && (
-                            <div className="text-center py-6">
-                              <p className="text-gray-500">You've unlocked all available achievements!</p>
+                            <div className="text-center py-4 sm:py-6">
+                              <p className="text-sm sm:text-base text-gray-500">You've unlocked all available achievements!</p>
                             </div>
                             )}
                           </div>

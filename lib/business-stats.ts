@@ -1,5 +1,9 @@
 import { supabase } from "./supabase"
 
+// Cache for business dashboard data
+const dashboardCache = new Map<string, { data: BusinessDashboardData, timestamp: number }>()
+const CACHE_DURATION = 120000 // 2 minutes
+
 export interface BusinessStats {
   totalBookings: number
   monthlyRevenue: number
@@ -270,37 +274,230 @@ export async function getBusinessServices(businessId: string): Promise<BusinessS
 // Get complete business dashboard data
 export async function getBusinessDashboardData(businessId: string): Promise<BusinessDashboardData> {
   try {
-    const [stats, recentBookings, services] = await Promise.all([
-      getBusinessStats(businessId),
+    // Check cache first
+    const cached = dashboardCache.get(businessId)
+    if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
+      return cached.data
+    }
+
+    // Optimized: Get all data in parallel to reduce total load time
+    const [statsData, recentBookingsData, dashboardInfoData] = await Promise.all([
+      getBusinessStatsOptimized(businessId),
       getRecentBookings(businessId, 10),
-      getBusinessServices(businessId)
+      supabase
+        .from("business_dashboards")
+        .select("*")
+        .eq("user_id", businessId)
+        .single()
     ])
 
-    // Get business dashboard info
-    const { data: dashboardData } = await supabase
-      .from("business_dashboards")
-      .select("*")
-      .eq("user_id", businessId)
-      .single()
+    // Get services separately but faster
+    const services = await getBusinessServicesOptimized(businessId, dashboardInfoData.data)
 
-    return {
-      stats,
-      recentBookings,
+    const result = {
+      stats: statsData,
+      recentBookings: recentBookingsData,
       services,
-      businessHours: dashboardData?.business_hours || {},
-      businessInfo: dashboardData || {}
+      businessHours: dashboardInfoData.data?.business_hours || {},
+      businessInfo: dashboardInfoData.data || {}
     }
+
+    // Cache the result
+    dashboardCache.set(businessId, {
+      data: result,
+      timestamp: Date.now()
+    })
+
+    return result
   } catch (error) {
     console.error("Error fetching business dashboard data:", error)
     
     // Return default data for new businesses
-    return {
-      stats: await getBusinessStats(businessId),
+    const fallbackData = {
+      stats: {
+        totalBookings: 0,
+        monthlyRevenue: 0,
+        customerRating: 0,
+        activeCustomers: 0,
+        pendingBookings: 0,
+        completedBookings: 0,
+        cancelledBookings: 0,
+        averageBookingValue: 0,
+        totalCustomers: 0,
+        thisMonthBookings: 0,
+        lastMonthBookings: 0,
+        revenueGrowth: 0
+      },
       recentBookings: [],
       services: [],
       businessHours: {},
       businessInfo: {}
     }
+
+    return fallbackData
+  }
+}
+
+// Optimized version of getBusinessStats that uses fewer queries
+async function getBusinessStatsOptimized(businessId: string): Promise<BusinessStats> {
+  try {
+    const startOfMonth = new Date()
+    startOfMonth.setDate(1)
+    startOfMonth.setHours(0, 0, 0, 0)
+
+    const startOfLastMonth = new Date()
+    startOfLastMonth.setMonth(startOfLastMonth.getMonth() - 1)
+    startOfLastMonth.setDate(1)
+    startOfLastMonth.setHours(0, 0, 0, 0)
+
+    const endOfLastMonth = new Date()
+    endOfLastMonth.setDate(0)
+    endOfLastMonth.setHours(23, 59, 59, 999)
+
+    // Get all bookings data in one query instead of multiple
+    const { data: allBookings } = await supabase
+      .from("bookings")
+      .select("total_amount, status, customer_id, created_at")
+      .eq("business_id", businessId)
+
+    if (!allBookings) {
+      return {
+        totalBookings: 0,
+        monthlyRevenue: 0,
+        customerRating: 4.8,
+        activeCustomers: 0,
+        pendingBookings: 0,
+        completedBookings: 0,
+        cancelledBookings: 0,
+        averageBookingValue: 0,
+        totalCustomers: 0,
+        thisMonthBookings: 0,
+        lastMonthBookings: 0,
+        revenueGrowth: 0
+      }
+    }
+
+    // Process all stats from the single query result
+    const totalBookings = allBookings.length
+    
+    const thisMonthBookings = allBookings.filter(b => 
+      new Date(b.created_at) >= startOfMonth
+    )
+    
+    const lastMonthBookings = allBookings.filter(b => {
+      const date = new Date(b.created_at)
+      return date >= startOfLastMonth && date <= endOfLastMonth
+    })
+
+    const monthlyRevenue = thisMonthBookings.reduce((sum, booking) => {
+      return sum + (parseFloat(booking.total_amount || "0"))
+    }, 0)
+
+    const pendingBookings = allBookings.filter(b => b.status === "pending").length
+    const completedBookings = allBookings.filter(b => b.status === "completed").length
+    const cancelledBookings = allBookings.filter(b => b.status === "cancelled").length
+
+    const uniqueCustomers = new Set(allBookings.map(b => b.customer_id))
+    const totalCustomers = uniqueCustomers.size
+
+    const averageBookingValue = allBookings.length > 0
+      ? allBookings.reduce((sum, booking) => sum + parseFloat(booking.total_amount || "0"), 0) / allBookings.length
+      : 0
+
+    const revenueGrowth = lastMonthBookings.length > 0
+      ? ((thisMonthBookings.length - lastMonthBookings.length) / lastMonthBookings.length) * 100
+      : 0
+
+    return {
+      totalBookings,
+      monthlyRevenue: Math.round(monthlyRevenue),
+      customerRating: 4.8,
+      activeCustomers: totalCustomers,
+      pendingBookings,
+      completedBookings,
+      cancelledBookings,
+      averageBookingValue: Math.round(averageBookingValue),
+      totalCustomers,
+      thisMonthBookings: thisMonthBookings.length,
+      lastMonthBookings: lastMonthBookings.length,
+      revenueGrowth: Math.round(revenueGrowth * 100) / 100
+    }
+  } catch (error) {
+    console.error("Error fetching optimized business stats:", error)
+    return {
+      totalBookings: 0,
+      monthlyRevenue: 0,
+      customerRating: 0,
+      activeCustomers: 0,
+      pendingBookings: 0,
+      completedBookings: 0,
+      cancelledBookings: 0,
+      averageBookingValue: 0,
+      totalCustomers: 0,
+      thisMonthBookings: 0,
+      lastMonthBookings: 0,
+      revenueGrowth: 0
+    }
+  }
+}
+
+// Optimized version of getBusinessServices
+async function getBusinessServicesOptimized(businessId: string, dashboardData: any): Promise<BusinessService[]> {
+  try {
+    if (!dashboardData?.services_offered) {
+      return []
+    }
+
+    const services = dashboardData.services_offered as any[]
+
+    // Get all service bookings in one query instead of one per service
+    const { data: serviceBookings } = await supabase
+      .from("bookings")
+      .select("service_name, total_amount, status")
+      .eq("business_id", businessId)
+
+    const serviceStats = new Map()
+
+    // Process bookings to calculate stats for each service
+    serviceBookings?.forEach(booking => {
+      const serviceName = booking.service_name
+      if (!serviceStats.has(serviceName)) {
+        serviceStats.set(serviceName, {
+          bookingsCount: 0,
+          totalRevenue: 0
+        })
+      }
+      
+      const stats = serviceStats.get(serviceName)
+      stats.bookingsCount++
+      
+      if (booking.status === "completed") {
+        stats.totalRevenue += parseFloat(booking.total_amount || "0")
+      }
+    })
+
+    return services.map(service => ({
+      id: service.id || Math.random().toString(36).substring(7),
+      name: service.name,
+      price: service.price || 0,
+      duration: service.duration || 60,
+      description: service.description || "",
+      isActive: service.isActive !== false,
+      bookingsCount: serviceStats.get(service.name)?.bookingsCount || 0,
+      totalRevenue: Math.round(serviceStats.get(service.name)?.totalRevenue || 0)
+    }))
+  } catch (error) {
+    console.error("Error fetching optimized business services:", error)
+    return []
+  }
+}
+
+// Function to clear cache (useful for when data is updated)
+export function clearBusinessDashboardCache(businessId?: string) {
+  if (businessId) {
+    dashboardCache.delete(businessId)
+  } else {
+    dashboardCache.clear()
   }
 }
 

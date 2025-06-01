@@ -2,14 +2,14 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Separator } from "@/components/ui/separator"
-import { Mail, Lock, Eye, EyeOff, Calendar, ArrowRight, Smartphone, AlertCircle } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff, Calendar, ArrowRight, Smartphone, AlertCircle, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { useToast } from "@/hooks/use-toast"
@@ -20,6 +20,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email")
   const [isLoading, setIsLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
     phone: "",
@@ -29,6 +30,11 @@ export default function LoginPage() {
 
   const { toast } = useToast()
   const router = useRouter()
+
+  // Handle client-side mounting to prevent hydration issues
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -64,6 +70,36 @@ export default function LoginPage() {
     }
   }
 
+  // Show loading state during hydration
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <Link href="/" className="inline-flex items-center space-x-2 mb-6">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold text-gray-900">FastBookr</span>
+            </Link>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back!</h2>
+            <p className="text-gray-600">Sign in to your account to continue booking</p>
+          </div>
+          <Card className="shadow-xl border-0">
+            <CardContent className="p-8">
+              <div className="animate-pulse space-y-6">
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-10 bg-gray-200 rounded"></div>
+                <div className="h-10 bg-gray-200 rounded"></div>
+                <div className="h-12 bg-gray-200 rounded"></div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -76,7 +112,17 @@ export default function LoginPage() {
             <span className="text-2xl font-bold text-gray-900">FastBookr</span>
           </Link>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back!</h2>
-          <p className="text-gray-600">Sign in to your account to continue booking</p>
+          <p className="text-gray-600 mb-4">Sign in to your account to continue booking</p>
+          
+          {/* Home Button */}
+          <div className="mb-6">
+            <Link href="/">
+              <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <Card className="shadow-xl border-0">
@@ -89,6 +135,7 @@ export default function LoginPage() {
                 className={`flex-1 flex items-center justify-center py-2 px-4 rounded-md text-sm font-medium transition-all ${
                   loginMethod === "email" ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
                 }`}
+                suppressHydrationWarning
               >
                 <Mail className="w-4 h-4 mr-2" />
                 Email
@@ -99,13 +146,14 @@ export default function LoginPage() {
                 className={`flex-1 flex items-center justify-center py-2 px-4 rounded-md text-sm font-medium transition-all ${
                   loginMethod === "phone" ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
                 }`}
+                suppressHydrationWarning
               >
                 <Smartphone className="w-4 h-4 mr-2" />
                 Phone
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6" suppressHydrationWarning>
               {/* Email/Phone Input */}
               <div className="space-y-2">
                 <Label htmlFor={loginMethod}>{loginMethod === "email" ? "Email Address" : "Phone Number"}</Label>
@@ -129,6 +177,7 @@ export default function LoginPage() {
                     className="pl-10"
                     required
                     disabled={isLoading}
+                    suppressHydrationWarning
                   />
                 </div>
               </div>
@@ -147,12 +196,14 @@ export default function LoginPage() {
                     className="pl-10 pr-10"
                     required
                     disabled={isLoading}
+                    suppressHydrationWarning
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     disabled={isLoading}
+                    suppressHydrationWarning
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -167,6 +218,7 @@ export default function LoginPage() {
                     checked={formData.rememberMe}
                     onCheckedChange={(checked) => setFormData({ ...formData, rememberMe: checked as boolean })}
                     disabled={isLoading}
+                    suppressHydrationWarning
                   />
                   <Label htmlFor="rememberMe" className="text-sm">
                     Remember me
@@ -182,6 +234,7 @@ export default function LoginPage() {
                 type="submit"
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 py-6 text-lg"
                 disabled={isLoading}
+                suppressHydrationWarning
               >
                 {isLoading ? (
                   <div className="flex items-center">
@@ -208,11 +261,11 @@ export default function LoginPage() {
 
             {/* Social Login */}
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="py-6" disabled={isLoading}>
+              <Button variant="outline" className="py-6" disabled={isLoading} suppressHydrationWarning>
                 <Image src="/placeholder.svg?height=20&width=20" alt="Google" width={20} height={20} className="mr-2" />
                 Google
               </Button>
-              <Button variant="outline" className="py-6" disabled={isLoading}>
+              <Button variant="outline" className="py-6" disabled={isLoading} suppressHydrationWarning>
                 <Image
                   src="/placeholder.svg?height=20&width=20"
                   alt="Facebook"

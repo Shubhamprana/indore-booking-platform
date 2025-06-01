@@ -25,11 +25,27 @@ Install the React DevTools extension for better development experience:
    npm install
    ```
 
-3. Set up environment variables (create `.env.local`):
+3. Set up environment variables:
+   
+   **🚨 SECURITY NOTICE: Never commit secrets to git!**
+   
+   Create `.env.local` in your project root:
+   ```bash
+   # Supabase Configuration
+   # Get these from https://supabase.com/dashboard/project/YOUR_PROJECT/settings/api
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
+   
+   # Development Environment
+   NODE_ENV=development
    ```
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
+   
+   **How to get your Supabase credentials:**
+   1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
+   2. Select your project
+   3. Navigate to Settings → API
+   4. Copy the Project URL and anon/public key
+   5. **Never share or commit these values!**
 
 4. Run the development server:
    ```bash
