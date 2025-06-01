@@ -297,20 +297,6 @@ export default function LoginPage() {
             <span>⚡ Instant Access</span>
           </div>
         </div>
-
-        {/* Demo Credentials */}
-        {/* <Card className="bg-blue-50 border-blue-200"> */}
-          {/* <CardContent className="p-4"> */}
-            {/* <div className="flex items-start space-x-2"> */}
-              {/* <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5" /> */}
-              {/* <div className="text-sm text-blue-800"> */}
-                {/* <p className="font-medium mb-1">Demo Credentials:</p> */}
-                {/* <p>Email: demo@booknow.com</p> */}
-                {/* <p>Password: demo123</p> */}
-              {/* </div> */}
-            {/* </div> */}
-          {/* </CardContent> */}
-        {/* </Card> */}
       </div>
     </div>
   )
