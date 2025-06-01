@@ -285,10 +285,10 @@ export async function getBusinessDashboardData(businessId: string): Promise<Busi
       getBusinessStatsOptimized(businessId),
       getRecentBookings(businessId, 10),
       supabase
-        .from("business_dashboards")
-        .select("*")
-        .eq("user_id", businessId)
-        .single()
+      .from("business_dashboards")
+      .select("*")
+      .eq("user_id", businessId)
+      .single()
     ])
 
     // Get services separately but faster

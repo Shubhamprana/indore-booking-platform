@@ -164,11 +164,11 @@ export default function WelcomePage() {
               <div className="text-center">
                 {referralCode ? (
                   <>
-                    <div className="text-4xl font-bold text-green-600 tracking-wider mb-4">{referralCode}</div>
-                    <Button onClick={copyReferralCode} className="bg-green-600 hover:bg-green-700 text-white">
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy Referral Code
-                    </Button>
+                <div className="text-4xl font-bold text-green-600 tracking-wider mb-4">{referralCode}</div>
+                <Button onClick={copyReferralCode} className="bg-green-600 hover:bg-green-700 text-white">
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy Referral Code
+                </Button>
                   </>
                 ) : (
                   <>

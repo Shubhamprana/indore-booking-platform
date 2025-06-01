@@ -271,7 +271,7 @@ export default function HomePage() {
 
             <div className="flex items-center space-x-2 sm:space-x-4">
               <div className="hidden xs:block">
-                <LocationSelector selectedLocation={selectedLocation} onLocationChange={setSelectedLocation} />
+              <LocationSelector selectedLocation={selectedLocation} onLocationChange={setSelectedLocation} />
               </div>
 
               {/* Language Toggle - Always visible */}
@@ -488,20 +488,20 @@ export default function HomePage() {
               {/* Quick Email Signup - Mobile Optimized */}
               <form onSubmit={handleQuickSignup} className="w-full">
                 <div className="flex flex-col gap-2 sm:gap-3 md:flex-row md:gap-0 md:relative">
-                  <Input
-                    type="email"
-                    placeholder={t.hero.searchPlaceholder}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                <Input
+                  type="email"
+                  placeholder={t.hero.searchPlaceholder}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                     className="w-full md:pr-36 py-3 sm:py-4 md:py-6 text-sm sm:text-base md:text-lg border-2 border-gray-200 focus:border-blue-500 rounded-xl"
-                    required
-                  />
-                  <Button
-                    type="submit"
+                  required
+                />
+                <Button
+                  type="submit"
                     className="w-full md:w-auto md:absolute md:right-2 md:top-1/2 md:transform md:-translate-y-1/2 bg-gradient-to-r from-blue-600 to-purple-600 py-3 sm:py-4 md:py-2 text-sm md:text-sm"
-                  >
-                    {t.hero.earlyAccess}
-                  </Button>
+                >
+                  {t.hero.earlyAccess}
+                </Button>
                 </div>
               </form>
 
@@ -528,7 +528,7 @@ export default function HomePage() {
             </div>
 
             <div className="order-first lg:order-last mt-4 sm:mt-0">
-              <HeroImage />
+            <HeroImage />
             </div>
           </div>
         </div>
