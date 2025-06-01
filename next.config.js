@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 
-// High-Performance Next.js Configuration for 1000+ Concurrent Users
+// Production-Ready Next.js Configuration for FastBookr
 const nextConfig = {
   // Enable React 18 features and concurrent rendering
   reactStrictMode: true,
@@ -8,60 +8,111 @@ const nextConfig = {
   // Performance optimizations
   compiler: {
     // Remove console.log in production for better performance
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn']
+    } : false,
   },
 
   // External packages that should be bundled
-  serverExternalPackages: ['@supabase/supabase-js'],
+  serverExternalPackages: ['@supabase/supabase-js', 'nodemailer'],
 
   // Image optimization for better performance
   images: {
     // Enable image optimization
     formats: ['image/webp', 'image/avif'],
     
-    // Optimize images from external domains
-    domains: [
-      'localhost',
-      'supabase.co',
-      'storage.googleapis.com',
-      'images.unsplash.com',
-      'avatars.githubusercontent.com',
+    // Use remote patterns instead of deprecated domains
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
     
     // Device sizes for responsive images
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    
+    // Optimize image loading
+    minimumCacheTTL: 31536000, // 1 year
   },
 
   // Webpack optimizations
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-    // Optimize bundle splitting
-    config.optimization = {
-      ...config.optimization,
-      splitChunks: {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-            priority: 10,
-          },
-          supabase: {
-            test: /[\\/]node_modules[\\/]@supabase[\\/]/,
-            name: 'supabase',
-            chunks: 'all',
-            priority: 20,
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            chunks: 'all',
-            priority: 5,
-            reuseExistingChunk: true,
-            enforce: true,
+    // Handle Node.js modules for server-side only
+    if (isServer) {
+      // For server-side, externalize nodemailer to prevent bundling issues
+      config.externals = config.externals || []
+      if (!config.externals.some(ext => 
+        (typeof ext === 'string' && ext.includes('nodemailer')) ||
+        (typeof ext === 'function' && ext.toString().includes('nodemailer'))
+      )) {
+        config.externals.push('nodemailer')
+      }
+    } else {
+      // For client-side, only add fallbacks for specific problematic modules
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        // Only add fallbacks for modules that are definitely server-side only
+        fs: false,
+        net: false,
+        tls: false,
+        dns: false,
+      }
+    }
+
+    // Optimize bundle splitting for production
+    if (!dev) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+              priority: 10,
+              enforce: true,
+            },
+            supabase: {
+              test: /[\\/]node_modules[\\/]@supabase[\\/]/,
+              name: 'supabase',
+              chunks: 'all',
+              priority: 20,
+              enforce: true,
+            },
+            react: {
+              test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+              name: 'react',
+              chunks: 'all',
+              priority: 30,
+              enforce: true,
+            },
+            common: {
+              name: 'common',
+              minChunks: 2,
+              chunks: 'all',
+              priority: 5,
+              reuseExistingChunk: true,
+              enforce: true,
+            },
           },
         },
-      },
+      }
     }
 
     // Add performance-optimized plugins
@@ -88,7 +139,7 @@ const nextConfig = {
     return config
   },
 
-  // Headers for security and performance
+  // Enhanced security and performance headers
   async headers() {
     return [
       {
@@ -119,11 +170,15 @@ const nextConfig = {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin'
           },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()'
+          },
           
           // Performance headers
           {
             key: 'X-Served-By',
-            value: 'Next.js'
+            value: 'FastBookr'
           },
         ],
       },
@@ -138,12 +193,12 @@ const nextConfig = {
         ],
       },
       {
-        // Cache API responses with shorter TTL
+        // Cache API responses appropriately
         source: '/api/(.*)',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=300, stale-while-revalidate=60'
+            value: 'public, max-age=0, must-revalidate'
           },
         ],
       },
@@ -170,6 +225,7 @@ const nextConfig = {
         destination: '/',
         permanent: true,
       },
+      // Add more redirects as needed
     ]
   },
 
@@ -204,18 +260,15 @@ const nextConfig = {
 
   // Production-specific optimizations
   ...(process.env.NODE_ENV === 'production' && {
-    compiler: {
-      removeConsole: {
-        exclude: ['error'],
-      },
-    },
-    
-    // Disable source maps for better performance
+    // Disable source maps for better performance and security
     productionBrowserSourceMaps: false,
+    
+    // Additional compression
+    compress: true,
   }),
 }
 
-// Bundle analyzer for optimization insights
+// Bundle analyzer for optimization insights (development only)
 if (process.env.ANALYZE === 'true') {
   const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: true,

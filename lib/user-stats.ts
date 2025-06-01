@@ -240,9 +240,56 @@ export async function getTotalUserCount(): Promise<number> {
 }
 
 // Process referral with milestone system
-export async function processReferral(referrerId: string, referredUserId: string, referralCode: string): Promise<void> {
+export const processReferral = async (referrerId: string, referredUserId: string, referralCode: string) => {
   try {
     await processReferralManually(referrerId, referredUserId, referralCode)
+
+    // Send reward notification email to referrer
+    try {
+      const { data: referrerProfile } = await supabase
+        .from("users")
+        .select("email, full_name")
+        .eq("id", referrerId)
+        .single()
+
+      const { data: referredProfile } = await supabase
+        .from("users")
+        .select("full_name")
+        .eq("id", referredUserId)
+        .single()
+
+      if (referrerProfile && referredProfile) {
+        // Send referral bonus notification via API call instead of direct import
+        try {
+          const response = await fetch('/api/reward-notification', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userEmail: referrerProfile.email,
+              userName: referrerProfile.full_name,
+              rewardType: 'referral_bonus',
+              amount: 25,
+              description: `${referredProfile.full_name} joined FastBookr using your referral code!`,
+              source: 'Referral Program'
+            }),
+          })
+          
+          if (response.ok) {
+            console.log(`Referral bonus notification sent to ${referrerProfile.email}`)
+          } else {
+            console.error('Failed to send referral bonus notification via API')
+          }
+        } catch (emailError) {
+          console.error('Failed to send referral bonus notification:', emailError)
+          // Don't throw - email failure shouldn't affect the referral process
+        }
+      }
+    } catch (profileError) {
+      console.error('Failed to fetch profiles for referral notification:', profileError)
+    }
+
   } catch (error) {
     console.error("Error in processReferral:", error)
   }

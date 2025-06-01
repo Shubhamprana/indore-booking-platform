@@ -1,12 +1,21 @@
 {
-  "name": "my-v0-project",
-  "version": "0.1.0",
+  "name": "fastbookr",
+  "version": "1.0.0",
   "private": true,
+  "description": "FastBookr - Skip the Wait, Book Instantly",
+  "keywords": ["booking", "reservations", "restaurant", "salon", "appointments"],
+  "author": "FastBookr Team",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "analyze": "ANALYZE=true npm run build",
+    "clean": "rm -rf .next",
+    "postbuild": "echo 'Build completed successfully!'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -49,6 +58,7 @@
     "lucide-react": "^0.454.0",
     "next": "15.2.4",
     "next-themes": "^0.4.4",
+    "nodemailer": "^7.0.3",
     "react": "^19",
     "react-day-picker": "8.10.1",
     "react-dom": "^19",
@@ -63,12 +73,26 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^15.2.4",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^22",
+    "@types/nodemailer": "^6.4.17",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/fastbookr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/fastbookr/issues"
+  },
+  "homepage": "https://fastbookr.com"
 }

@@ -89,6 +89,45 @@ export async function grantInitialBusinessBonus(businessUserId: string): Promise
     businessSubCache.delete(businessUserId)
     businessDashCache.delete(businessUserId)
 
+    // Send pro subscription reward notification
+    try {
+      const { data: userProfile } = await supabase
+        .from("users")
+        .select("email, full_name")
+        .eq("id", businessUserId)
+        .single()
+
+      if (userProfile) {
+        try {
+          // Send pro subscription notification via API call instead of direct import
+          const response = await fetch('/api/reward-notification', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userEmail: userProfile.email,
+              userName: userProfile.full_name,
+              rewardType: 'pro_subscription',
+              description: 'Enjoy 3 months of premium features and exclusive benefits!',
+              source: 'Business registration bonus'
+            }),
+          })
+          
+          if (response.ok) {
+            console.log(`Pro subscription bonus notification sent to ${userProfile.email}`)
+          } else {
+            console.error('Failed to send pro subscription notification via API')
+          }
+        } catch (emailError) {
+          console.error('Failed to send pro subscription notification:', emailError)
+          // Don't throw - email failure shouldn't affect the bonus granting
+        }
+      }
+    } catch (profileError) {
+      console.error('Failed to fetch profile for pro subscription notification:', profileError)
+    }
+
     console.log(`Successfully granted initial business bonus to user ${businessUserId}`)
   } catch (error) {
     console.error('Error in grantInitialBusinessBonus:', error)

@@ -362,23 +362,23 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 sm:py-6 md:py-8">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 sm:py-6 md:py-8">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-8">
-          <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3 xs:gap-0">
+          <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 xs:gap-0">
             <Link href="/" className="flex items-center space-x-2">
               <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                <Calendar className="w-3 h-3 sm:w-5 sm:h-5 text-white" />
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-lg sm:text-xl font-bold">FastBookr</span>
-              <Badge variant="secondary" className="bg-white/20 text-white border-white/30 text-xs px-1 py-0.5 sm:px-2 sm:py-1">
+              <span className="text-base sm:text-xl font-bold">FastBookr</span>
+              <Badge variant="secondary" className="bg-white/20 text-white border-white/30 text-[10px] sm:text-xs px-1 py-0.5 sm:px-2 sm:py-1">
                 Pre-Launch
               </Badge>
             </Link>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 w-full xs:w-auto">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-3 md:gap-4 w-full xs:w-auto">
               <Button 
                 variant="outline" 
                 size="sm"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                 onClick={refreshStats}
               >
                 <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -386,13 +386,13 @@ export default function ProfilePage() {
                 <span className="xs:hidden">Refresh</span>
               </Button>
               <Link href="/">
-                <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3">
+                <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3">
                   Home
                 </Button>
               </Link>
               {profile?.user_type === 'business' && (
                 <Link href="/business/dashboard">
-                  <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3">
+                  <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3">
                     <span className="hidden sm:inline">Dashboard</span>
                     <span className="sm:hidden">Dash</span>
                   </Button>
@@ -401,7 +401,7 @@ export default function ProfilePage() {
               <Button 
                 variant="outline" 
                 size="sm"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                 onClick={async () => {
                   await signOut()
                   window.location.href = "/login"
@@ -415,86 +415,86 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 md:py-8">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-6 md:py-8">
         <div className="grid gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-3">
           {/* Profile Sidebar */}
           <div className="lg:col-span-1">
             <Card>
-              <CardContent className="p-4 sm:p-6">
-                <div className="text-center mb-4 sm:mb-6">
+              <CardContent className="p-3 sm:p-6">
+                <div className="text-center mb-3 sm:mb-6">
                   <div className="relative inline-block">
-                    <Avatar className="w-20 h-20 sm:w-24 sm:h-24 mx-auto">
+                    <Avatar className="w-16 h-16 sm:w-24 sm:h-24 mx-auto">
                       <AvatarImage src={profileData.profileImage || "/placeholder.svg"} alt={profileData.fullName} />
-                      <AvatarFallback className="text-lg sm:text-2xl">
+                      <AvatarFallback className="text-sm sm:text-2xl">
                         {profileData.fullName
                           .split(" ")
                           .map((n) => n[0])
                           .join("")}
                       </AvatarFallback>
                     </Avatar>
-                    <Button size="sm" className="absolute bottom-0 right-0 rounded-full w-7 h-7 sm:w-8 sm:h-8 p-0" variant="outline">
+                    <Button size="sm" className="absolute bottom-0 right-0 rounded-full w-6 h-6 sm:w-8 sm:h-8 p-0" variant="outline">
                       <Camera className="w-3 h-3 sm:w-4 sm:h-4" />
                     </Button>
                   </div>
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mt-3 sm:mt-4">{profileData.fullName}</h2>
-                  <p className="text-sm sm:text-base text-gray-600">{profileData.email}</p>
-                  <Badge className="mt-2 bg-green-100 text-green-800 text-xs">Early Adopter #{userStats?.position_rank || 0}</Badge>
+                  <h2 className="text-base sm:text-xl font-bold text-gray-900 mt-2 sm:mt-4">{profileData.fullName}</h2>
+                  <p className="text-xs sm:text-base text-gray-600">{profileData.email}</p>
+                  <Badge className="mt-1 sm:mt-2 bg-green-100 text-green-800 text-[10px] sm:text-xs">Early Adopter #{userStats?.position_rank || 0}</Badge>
                 </div>
 
-                <div className="space-y-3 sm:space-y-4">
-                  <div className="flex items-center text-gray-600 text-sm sm:text-base">
+                <div className="space-y-2 sm:space-y-4">
+                  <div className="flex items-center text-gray-600 text-xs sm:text-base">
                     <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-2 sm:mr-3 flex-shrink-0" />
                     <span className="truncate">{profileData.phone}</span>
                   </div>
-                  <div className="flex items-center text-gray-600 text-sm sm:text-base">
+                  <div className="flex items-center text-gray-600 text-xs sm:text-base">
                     <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2 sm:mr-3 flex-shrink-0" />
                     <span className="truncate">{profileData.location}</span>
                   </div>
-                  <div className="flex items-center text-gray-600 text-sm sm:text-base">
+                  <div className="flex items-center text-gray-600 text-xs sm:text-base">
                     <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-2 sm:mr-3 flex-shrink-0" />
                     <span>Joined {new Date(profileData.joinDate).toLocaleDateString()}</span>
                   </div>
                 </div>
 
-                <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
-                  <h3 className="font-semibold text-gray-900 mb-3 text-sm sm:text-base">Quick Stats</h3>
-                  <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+                <div className="mt-3 sm:mt-6 pt-3 sm:pt-6 border-t border-gray-200">
+                  <h3 className="font-semibold text-gray-900 mb-2 sm:mb-3 text-xs sm:text-base">Quick Stats</h3>
+                  <div className="grid grid-cols-3 gap-1 sm:gap-4 text-center">
                     <div>
-                      <div className="text-lg sm:text-2xl font-bold text-blue-600">{userStats?.successful_referrals || 0}</div>
-                      <div className="text-xs sm:text-sm text-gray-600">Referrals</div>
+                      <div className="text-sm sm:text-2xl font-bold text-blue-600">{userStats?.successful_referrals || 0}</div>
+                      <div className="text-[10px] sm:text-sm text-gray-600">Referrals</div>
                     </div>
                     <div>
-                      <div className="text-lg sm:text-2xl font-bold text-green-600">₹{userStats?.credits_earned?.toLocaleString() || 0}</div>
-                      <div className="text-xs sm:text-sm text-gray-600">Credits</div>
+                      <div className="text-sm sm:text-2xl font-bold text-green-600">₹{userStats?.credits_earned?.toLocaleString() || 0}</div>
+                      <div className="text-[10px] sm:text-sm text-gray-600">Credits</div>
                     </div>
                     <div>
-                      <div className="text-lg sm:text-2xl font-bold text-purple-600">{userStats?.total_points?.toLocaleString() || 0}</div>
-                      <div className="text-xs sm:text-sm text-gray-600">Points</div>
+                      <div className="text-sm sm:text-2xl font-bold text-purple-600">{userStats?.total_points?.toLocaleString() || 0}</div>
+                      <div className="text-[10px] sm:text-sm text-gray-600">Points</div>
                     </div>
                     <div>
-                      <div className="text-lg sm:text-2xl font-bold text-yellow-600">{achievements.length}</div>
-                      <div className="text-xs sm:text-sm text-gray-600">Achievements</div>
+                      <div className="text-sm sm:text-2xl font-bold text-yellow-600">{achievements.length}</div>
+                      <div className="text-[10px] sm:text-sm text-gray-600">Achievements</div>
                     </div>
                     <div>
-                      <div className="text-lg sm:text-2xl font-bold text-indigo-600">{followStats.followers_count || 0}</div>
-                      <div className="text-xs sm:text-sm text-gray-600">Followers</div>
+                      <div className="text-sm sm:text-2xl font-bold text-indigo-600">{followStats.followers_count || 0}</div>
+                      <div className="text-[10px] sm:text-sm text-gray-600">Followers</div>
                     </div>
                     <div>
-                      <div className="text-lg sm:text-2xl font-bold text-pink-600">{followStats.following_count || 0}</div>
-                      <div className="text-xs sm:text-sm text-gray-600">Following</div>
+                      <div className="text-sm sm:text-2xl font-bold text-pink-600">{followStats.following_count || 0}</div>
+                      <div className="text-[10px] sm:text-sm text-gray-600">Following</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-4 sm:mt-6 space-y-3">
+                <div className="mt-3 sm:mt-6 space-y-2 sm:space-y-3">
                   {!isEditing ? (
-                    <Button onClick={() => setIsEditing(true)} className="w-full h-10 sm:h-11 text-sm sm:text-base">
-                      <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                    <Button onClick={() => setIsEditing(true)} className="w-full h-8 sm:h-11 text-xs sm:text-base">
+                      <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                       Edit Profile
                     </Button>
                   ) : (
-                    <Button onClick={handleSave} className="w-full bg-green-600 hover:bg-green-700 h-10 sm:h-11 text-sm sm:text-base">
-                      <Save className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                    <Button onClick={handleSave} className="w-full bg-green-600 hover:bg-green-700 h-8 sm:h-11 text-xs sm:text-base">
+                      <Save className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                       Save Changes
                     </Button>
                   )}
@@ -503,33 +503,33 @@ export default function ProfilePage() {
             </Card>
 
             {/* Referral Card */}
-            <Card className="mt-4 sm:mt-6">
-              <CardContent className="p-4 sm:p-6">
-                <div className="text-center mb-4">
-                  <Gift className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600 mx-auto mb-2" />
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Your Referral Code</h3>
-                  <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">Earn ₹50 credits every 2 friends you refer</p>
+            <Card className="mt-3 sm:mt-6">
+              <CardContent className="p-3 sm:p-6">
+                <div className="text-center mb-3 sm:mb-4">
+                  <Gift className="w-6 h-6 sm:w-10 sm:h-10 text-purple-600 mx-auto mb-1 sm:mb-2" />
+                  <h3 className="text-sm sm:text-lg font-semibold text-gray-900">Your Referral Code</h3>
+                  <p className="text-[10px] sm:text-sm text-gray-600 mb-2 sm:mb-4">Earn ₹50 credits every 2 friends you refer</p>
                   <div className="bg-purple-50 p-2 sm:p-3 rounded-lg border border-purple-200 flex items-center justify-between">
-                    <div className="text-lg sm:text-xl font-bold text-purple-700">{profileData.referralCode}</div>
-                    <Button variant="ghost" size="sm" onClick={copyReferralCode} className="h-8 w-8 p-0">
+                    <div className="text-sm sm:text-xl font-bold text-purple-700">{profileData.referralCode}</div>
+                    <Button variant="ghost" size="sm" onClick={copyReferralCode} className="h-6 w-6 sm:h-8 sm:w-8 p-0">
                       <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                     </Button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 sm:gap-4 text-center mt-4 sm:mt-6">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 text-center mt-3 sm:mt-6">
                   <div>
-                    <div className="text-lg sm:text-2xl font-bold text-blue-600">{userStats?.successful_referrals || 0}</div>
-                    <div className="text-xs sm:text-sm text-gray-600">Friends Joined</div>
+                    <div className="text-sm sm:text-2xl font-bold text-blue-600">{userStats?.successful_referrals || 0}</div>
+                    <div className="text-[10px] sm:text-sm text-gray-600">Friends Joined</div>
                   </div>
                   <div>
-                    <div className="text-lg sm:text-2xl font-bold text-green-600">₹{userStats?.credits_earned?.toLocaleString() || 0}</div>
-                    <div className="text-xs sm:text-sm text-gray-600">Credits Earned</div>
+                    <div className="text-sm sm:text-2xl font-bold text-green-600">₹{userStats?.credits_earned?.toLocaleString() || 0}</div>
+                    <div className="text-[10px] sm:text-sm text-gray-600">Credits Earned</div>
                   </div>
                 </div>
 
                 {/* Progress towards milestone */}
-                <div className="mt-3 sm:mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="mt-2 sm:mt-4 p-2 sm:p-3 bg-blue-50 rounded-lg border border-blue-200">
                   {(() => {
                     const totalReferrals = userStats?.successful_referrals || 0
                     const currentMilestone = Math.ceil(totalReferrals / 2) || 1
