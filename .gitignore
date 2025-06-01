@@ -26,3 +26,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+
+# Security - Prevent accidental exposure of sensitive files
+replacements.txt
+*.git/
+secret*
+token*
+*.key
+*.pem
+.env.backup
+.env.production.local
