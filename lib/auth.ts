@@ -226,9 +226,8 @@ export const register = async (registerData: RegisterData) => {
 
         // Send welcome email
         try {
-          // Always use API call for consistency and reliability
-          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-          const welcomeEmailResponse = await fetch(`${baseUrl}/api/welcome-email`, {
+          // Use relative URL for internal API calls - works in all environments
+          const welcomeEmailResponse = await fetch('/api/welcome-email', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -242,16 +241,15 @@ export const register = async (registerData: RegisterData) => {
               businessBonus: registerData.userType === 'business'
             }),
           })
-          
-          if (welcomeEmailResponse.ok) {
-            console.log("Welcome email sent successfully via API to:", registerData.email)
+
+          if (!welcomeEmailResponse.ok) {
+            console.error('Failed to send welcome email:', await welcomeEmailResponse.text())
           } else {
-            const responseText = await welcomeEmailResponse.text()
-            console.warn("Welcome email API failed:", welcomeEmailResponse.status, responseText)
+            console.log('Welcome email sent successfully')
           }
-        } catch (emailError) {
-          console.error("Background: Welcome email error:", emailError)
-          // Silently fail - email failure shouldn't affect registration
+        } catch (error) {
+          console.error('Welcome email error:', error)
+          // Don't throw - continue with registration even if email fails
         }
 
         // Handle business operations
