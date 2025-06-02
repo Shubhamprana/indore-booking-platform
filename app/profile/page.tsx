@@ -34,20 +34,13 @@ import Link from "next/link"
 import { useAuth } from "@/hooks/use-auth"
 import { updateUserProfile } from "@/lib/auth"
 import { 
-  getUserStats, 
-  getUserStatsWithRecalculation,
-  getUserAchievements, 
-  getUserActivities, 
-  getUserReferrals,
-  getTotalUserCount,
-  clearUserStatsCache,
   type UserStats,
   type Achievement,
   type UserActivity,
   type Referral
 } from "@/lib/user-stats"
 import { useToast } from "@/hooks/use-toast"
-import { getUserFollowStats, type FollowStats } from "@/lib/follow-system"
+import { type FollowStats } from "@/lib/follow-system"
 
 interface ProfileData {
   fullName: string
@@ -156,67 +149,38 @@ export default function ProfilePage() {
       };
 
       try {
-        // Load user stats (this now reads existing stats without recalculating)
-        console.log("Loading user stats for profile page...")
-        const stats = await getUserStats(user.id);
-        console.log("Stats loaded:", stats)
-        setUserStats(stats || defaultStats);
+        // Load all user data via API instead of direct function calls
+        console.log("Loading user data via API for profile page...")
+        const response = await fetch(`/api/user-stats?userId=${user.id}&action=all`)
         
-        // Load other data in parallel to improve performance
-        const [achievements, activities, referrals, totalCount, followStatsData] = await Promise.allSettled([
-          getUserAchievements(user.id),
-          getUserActivities(user.id, 5),
-          getUserReferrals(user.id),
-          getTotalUserCount(),
-          getUserFollowStats(user.id)
-        ]);
-        
-        // Set achievements data
-        if (achievements.status === 'fulfilled') {
-          setAchievements(achievements.value);
-        } else {
-          console.error("Error loading achievements:", achievements.reason);
-          setAchievements([]);
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status}`)
         }
         
-        // Set activities data
-        if (activities.status === 'fulfilled') {
-          setRecentActivity(activities.value);
-        } else {
-          console.error("Error loading activities:", activities.reason);
-          setRecentActivity([]);
-        }
+        const result = await response.json()
         
-        // Set referrals data
-        if (referrals.status === 'fulfilled') {
-          setReferrals(referrals.value);
+        if (result.success && result.data) {
+          // Set all data from API response
+          setUserStats(result.data.stats || defaultStats)
+          setAchievements(result.data.achievements || [])
+          setRecentActivity(result.data.activities || [])
+          setReferrals(result.data.referrals || [])
+          setFollowStats(result.data.followStats || { followers_count: 0, following_count: 0 })
+          setTotalUsers(result.data.totalUsers || 15847)
+          
+          console.log("User data loaded successfully via API")
         } else {
-          console.error("Error loading referrals:", referrals.reason);
-          setReferrals([]);
-        }
-        
-        // Set total user count
-        if (totalCount.status === 'fulfilled') {
-          setTotalUsers(totalCount.value);
-        } else {
-          console.error("Error loading total count:", totalCount.reason);
-          setTotalUsers(15847);
-        }
-        
-        // Set follow stats data
-        if (followStatsData.status === 'fulfilled') {
-          setFollowStats(followStatsData.value);
-        } else {
-          console.error("Error loading follow stats:", followStatsData.reason);
-          setFollowStats({ followers_count: 0, following_count: 0 });
+          throw new Error(result.error || 'Failed to load user data')
         }
       } catch (error) {
-        console.error("Error loading user data:", error);
+        console.error("Error loading user data via API:", error);
+        // Set fallback data
         setUserStats(defaultStats);
         setAchievements([]);
         setRecentActivity([]);
         setReferrals([]);
         setFollowStats({ followers_count: 0, following_count: 0 });
+        setTotalUsers(15847);
       }
     };
 
@@ -229,17 +193,25 @@ export default function ProfilePage() {
 
     const interval = setInterval(async () => {
       try {
-        // Refresh follow stats every 30 seconds
-        const newFollowStats = await getUserFollowStats(user.id)
-        setFollowStats(newFollowStats)
+        // Refresh follow stats via API
+        const followStatsResponse = await fetch(`/api/user-stats?userId=${user.id}&action=follow-stats`)
+        if (followStatsResponse.ok) {
+          const followStatsResult = await followStatsResponse.json()
+          if (followStatsResult.success) {
+            setFollowStats(followStatsResult.data)
+          }
+        }
         
-        // Refresh user stats every 2 minutes
-        const newStats = await getUserStats(user.id)
-        if (newStats) {
-          setUserStats(newStats)
+        // Refresh user stats via API
+        const statsResponse = await fetch(`/api/user-stats?userId=${user.id}&action=stats`)
+        if (statsResponse.ok) {
+          const statsResult = await statsResponse.json()
+          if (statsResult.success && statsResult.data) {
+            setUserStats(statsResult.data)
+          }
         }
       } catch (error) {
-        console.error("Error refreshing profile data:", error)
+        console.error("Error refreshing profile data via API:", error)
       }
     }, 30000) // 30 seconds
 
@@ -250,21 +222,37 @@ export default function ProfilePage() {
     if (!user) return
     
     try {
-      // Clear cache and force recalculation
-      clearUserStatsCache(user.id)
-      const newStats = await getUserStatsWithRecalculation(user.id)
-      setUserStats(newStats)
+      // Clear cache via API
+      await fetch('/api/user-stats?action=clear-cache', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id })
+      })
       
-      // Also refresh follow stats
-      const newFollowStats = await getUserFollowStats(user.id)
-      setFollowStats(newFollowStats)
+      // Force recalculation via API
+      const response = await fetch(`/api/user-stats?userId=${user.id}&action=stats-recalculate`)
+      if (response.ok) {
+        const result = await response.json()
+        if (result.success && result.data) {
+          setUserStats(result.data)
+        }
+      }
+      
+      // Also refresh follow stats via API
+      const followStatsResponse = await fetch(`/api/user-stats?userId=${user.id}&action=follow-stats`)
+      if (followStatsResponse.ok) {
+        const followStatsResult = await followStatsResponse.json()
+        if (followStatsResult.success) {
+          setFollowStats(followStatsResult.data)
+        }
+      }
       
       toast({
         title: "Stats Refreshed! 📊",
         description: "Your profile statistics have been updated.",
       })
     } catch (error) {
-      console.error("Error refreshing stats:", error)
+      console.error("Error refreshing stats via API:", error)
       toast({
         title: "Refresh Failed",
         description: "Unable to refresh statistics. Please try again.",

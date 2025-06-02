@@ -5,7 +5,7 @@ import {
   getUserActivities as getActivitiesFromDB, 
   calculateAndUpdateUserStats,
   initializeUserStats as initStats,
-  createUserActivity
+  createUserActivity 
 } from "./supabase"
 
 // Main interfaces
@@ -244,7 +244,7 @@ export const processReferral = async (referrerId: string, referredUserId: string
   try {
     await processReferralManually(referrerId, referredUserId, referralCode)
 
-    // Send reward notification email to referrer
+    // Send referral reward notification email
     try {
       const { data: referrerProfile } = await supabase
         .from("users")
@@ -259,9 +259,10 @@ export const processReferral = async (referrerId: string, referredUserId: string
         .single()
 
       if (referrerProfile && referredProfile) {
-        // Send referral bonus notification via API call instead of direct import
+        // Use API call instead of direct import to avoid client-side bundling issues
         try {
-          const response = await fetch('/api/reward-notification', {
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+          const response = await fetch(`${baseUrl}/api/reward-notification`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -279,7 +280,8 @@ export const processReferral = async (referrerId: string, referredUserId: string
           if (response.ok) {
             console.log(`Referral bonus notification sent to ${referrerProfile.email}`)
           } else {
-            console.error('Failed to send referral bonus notification via API')
+            const responseText = await response.text()
+            console.error('Referral bonus API failed:', response.status, responseText)
           }
         } catch (emailError) {
           console.error('Failed to send referral bonus notification:', emailError)

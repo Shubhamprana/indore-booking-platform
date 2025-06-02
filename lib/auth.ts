@@ -226,47 +226,32 @@ export const register = async (registerData: RegisterData) => {
 
         // Send welcome email
         try {
-          // Try direct server-side email sending first (more reliable)
-          if (typeof window === 'undefined') {
-            // We're on server-side, use direct email sending
-            const { sendWelcomeEmailDirect } = await import('./email-service')
-            await sendWelcomeEmailDirect({
+          // Always use API call for consistency and reliability
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+          const welcomeEmailResponse = await fetch(`${baseUrl}/api/welcome-email`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
               userEmail: registerData.email.toLowerCase(),
               userName: registerData.fullName,
               userType: registerData.userType,
               referralCode: userProfile.referral_code,
               hasReferralReward: !!registerData.referralCode,
               businessBonus: registerData.userType === 'business'
-            })
-            console.log("Welcome email sent directly (server-side) to:", registerData.email)
+            }),
+          })
+          
+          if (welcomeEmailResponse.ok) {
+            console.log("Welcome email sent successfully via API to:", registerData.email)
           } else {
-            // Fallback to API call (client-side)
-            const welcomeEmailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/welcome-email`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                userEmail: registerData.email.toLowerCase(),
-                userName: registerData.fullName,
-                userType: registerData.userType,
-                referralCode: userProfile.referral_code,
-                hasReferralReward: !!registerData.referralCode,
-                businessBonus: registerData.userType === 'business'
-              }),
-            })
-            
-            if (welcomeEmailResponse.ok) {
-              console.log("Welcome email sent successfully via API to:", registerData.email)
-            } else {
-              console.warn("Welcome email API returned non-200 status:", welcomeEmailResponse.status)
-            }
+            const responseText = await welcomeEmailResponse.text()
+            console.warn("Welcome email API failed:", welcomeEmailResponse.status, responseText)
           }
         } catch (emailError) {
           console.error("Background: Welcome email error:", emailError)
-          // Try alternative method if available or log for manual follow-up
-          console.log("Note: Manual welcome email may be needed for:", registerData.email)
-          // Don't throw - email failure shouldn't affect registration
+          // Silently fail - email failure shouldn't affect registration
         }
 
         // Handle business operations

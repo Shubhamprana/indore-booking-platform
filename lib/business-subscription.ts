@@ -163,6 +163,53 @@ export async function processBusinessReferral(
     businessSubCache.delete(referredUserId)
     businessDashCache.delete(referrerId)
     businessDashCache.delete(referredUserId)
+
+    // Send referrer bonus notification for business referral
+    try {
+      const { data: referrerProfile } = await supabase
+        .from("users")
+        .select("email, full_name, business_name")
+        .eq("id", referrerId)
+        .single()
+
+      const { data: referredProfile } = await supabase
+        .from("users")
+        .select("full_name, business_name")
+        .eq("id", referredUserId)
+        .single()
+
+      if (referrerProfile && referredProfile) {
+        try {
+          // Send business referral bonus notification via API call
+          const response = await fetch('/api/reward-notification', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userEmail: referrerProfile.email,
+              userName: referrerProfile.full_name,
+              rewardType: 'pro_subscription',
+              description: `🎉 Business Referral Success! ${referredProfile.business_name || referredProfile.full_name} joined as a business partner using your referral code. You've earned 1 month FREE Pro subscription!`,
+              source: 'Business Referral Program',
+              amount: 1
+            }),
+          })
+          
+          if (response.ok) {
+            console.log(`Business referral bonus notification sent to ${referrerProfile.email}`)
+          } else {
+            console.error('Failed to send business referral bonus notification via API')
+          }
+        } catch (emailError) {
+          console.error('Failed to send business referral bonus notification:', emailError)
+          // Don't throw - email failure shouldn't affect the referral process
+        }
+      }
+    } catch (profileError) {
+      console.error('Failed to fetch profiles for business referral notification:', profileError)
+    }
+
   } catch (error) {
     console.error('Error in processBusinessReferral:', error)
     throw error
