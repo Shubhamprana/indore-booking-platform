@@ -31,7 +31,7 @@
 
 ### **Email Types Sent:**
 1. **Welcome Email**: Sent to all new business users with business-specific benefits
-2. **Pro Subscription Bonus**: 3 months free pro subscription notification  
+2. **Pro Subscription Bonus**: LIFETIME FREE pro subscription notification  
 3. **Referral Bonus**: Sent to referrer when business joins (1 month free pro)
 
 ## Testing Results ✅

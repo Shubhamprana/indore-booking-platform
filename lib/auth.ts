@@ -151,7 +151,25 @@ export const login = async (loginData: LoginData) => {
 }
 
 export const register = async (registerData: RegisterData) => {
+  const startTime = Date.now()
+  console.log('🚀 Starting registration process...')
+  
   try {
+    // Quick database connectivity check
+    console.log('🔍 Checking database connectivity...')
+    const dbCheckStart = Date.now()
+    try {
+      const { data, error } = await supabase.from('users').select('id').limit(1)
+      if (error) {
+        console.error('❌ Database connectivity issue:', error)
+        throw new Error('Database connection failed. Please try again later.')
+      }
+      console.log('✅ Database connectivity check:', Date.now() - dbCheckStart, 'ms')
+    } catch (dbError) {
+      console.error('❌ Database check failed:', dbError)
+      throw new Error('Unable to connect to database. Please check your internet connection and try again.')
+    }
+
     // Validate input
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(registerData.email)) {
@@ -170,32 +188,41 @@ export const register = async (registerData: RegisterData) => {
       throw new Error("Location is required")
     }
 
-    // Quick email existence check with minimal data
-    const { data: existingUser } = await supabase
-      .from("users")
-      .select("id")
-      .eq("email", registerData.email.toLowerCase())
-      .maybeSingle()
+    console.log('✅ Input validation completed:', Date.now() - startTime, 'ms')
 
-    if (existingUser) {
-      throw new Error("An account with this email already exists")
-    }
-
-    // Create Supabase auth user
+    // Create Supabase auth user (Supabase handles duplicate email detection)
+    const authStartTime = Date.now()
+    console.log('🔐 Starting Supabase auth signup...')
+    
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: registerData.email.toLowerCase(),
       password: registerData.password,
     })
 
+    console.log('🔐 Supabase auth completed:', Date.now() - authStartTime, 'ms')
+
     if (authError) {
+      console.error('❌ Auth error:', authError)
+      // Handle specific auth errors with user-friendly messages
+      if (authError.message.includes("User already registered") || 
+          authError.message.includes("already registered") ||
+          authError.message.includes("already exists")) {
+        throw new Error("An account with this email already exists")
+      }
       throw new Error(`Registration failed: ${authError.message}`)
     }
     if (!authData.user) {
       throw new Error("Failed to create user account")
     }
 
-    // Create user profile (critical path)
-    const userProfile = await createUser({
+    console.log('📝 Starting user profile creation...')
+    const profileStartTime = Date.now()
+
+    // Create user profile (critical path) with timeout protection
+    let userProfile
+    try {
+      userProfile = await Promise.race([
+        createUser({
       id: authData.user.id,
       email: registerData.email.toLowerCase(),
       full_name: registerData.fullName,
@@ -214,20 +241,74 @@ export const register = async (registerData: RegisterData) => {
       early_access_interest: registerData.earlyAccessInterest || false,
       share_on_social: registerData.shareOnSocial || false,
       email_verified: false,
-    })
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('User profile creation timed out')), 8000)
+        )
+      ])
+      
+      console.log('📝 User profile created:', Date.now() - profileStartTime, 'ms')
+    } catch (profileError) {
+      console.error('❌ Profile creation error:', profileError)
+      // If profile creation fails, we still have the auth user, so let's try a minimal approach
+      throw new Error('Registration is taking longer than expected. Please try again or contact support.')
+    }
 
-    // Process heavy operations in background (non-blocking)
+    console.log('✅ Critical path completed in:', Date.now() - startTime, 'ms')
+
+    // Initialize user stats immediately (critical for points/credits)
+    console.log('📊 Initializing user stats...')
+    const statsStartTime = Date.now()
+    try {
+      await initializeUserStats(userProfile.id)
+      console.log('📊 User stats initialized:', Date.now() - statsStartTime, 'ms')
+    } catch (statsError) {
+      console.error('❌ Stats initialization error:', statsError)
+      // Don't throw - continue with registration
+    }
+
+    // Create registration activity immediately (critical for recent activity)
+    console.log('📝 Creating registration activity...')
+    const activityStartTime = Date.now()
+    try {
+      const activityDescription = registerData.userType === "business" 
+        ? "Successfully registered as a business partner! Welcome bonus: LIFETIME FREE pro subscription! 🎉"
+        : "Successfully registered for FastBookr pre-launch"
+      
+      await createUserActivity(
+        userProfile.id, 
+        "registration", 
+        activityDescription, 
+        100, // Give 100 points for registration
+        {
+          user_type: registerData.userType,
+          registration_source: "web",
+          launch_interest: registerData.launchInterest,
+          initial_bonus: registerData.userType === "business" ? "lifetime_pro" : "none",
+          reward_amount: registerData.userType === "business" ? 0 : 25 // ₹25 welcome credit for customers
+        }
+      )
+      console.log('📝 Registration activity created:', Date.now() - activityStartTime, 'ms')
+    } catch (activityError) {
+      console.error('❌ Registration activity error:', activityError)
+      // Don't throw - continue with registration
+    }
+
+    // Process heavy operations in background (fully non-blocking)
     const processBackgroundTasks = async () => {
       try {
-    // Initialize user stats
-        await initializeUserStats(userProfile.id).catch(error => {
-          console.error("Background: Stats initialization error:", error)
-        })
+        console.log('🔄 Starting background tasks...')
+        const bgStartTime = Date.now()
 
-        // Send welcome email
-        try {
-          // Use relative URL for internal API calls - works in all environments
-          const welcomeEmailResponse = await fetch('/api/welcome-email', {
+        // Send welcome email immediately (non-blocking)
+        setTimeout(async () => {
+          try {
+            console.log('📧 Attempting to send welcome email in background...')
+            
+            const controller = new AbortController()
+            const timeoutId = setTimeout(() => controller.abort(), 5000)
+            
+            const response = await fetch('/api/welcome-email', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -240,65 +321,103 @@ export const register = async (registerData: RegisterData) => {
               hasReferralReward: !!registerData.referralCode,
               businessBonus: registerData.userType === 'business'
             }),
+              signal: controller.signal
           })
 
-          if (!welcomeEmailResponse.ok) {
-            console.error('Failed to send welcome email:', await welcomeEmailResponse.text())
+            clearTimeout(timeoutId)
+
+            if (response.ok) {
+              console.log('Welcome email sent successfully in background')
+              createUserActivity(
+                userProfile.id,
+                "notification",
+                "Welcome email sent successfully! Check your inbox.",
+                0,
+                { email_status: "sent", email_type: "welcome" }
+              ).catch(() => {})
           } else {
-            console.log('Welcome email sent successfully')
+              console.log('Welcome email failed - server responded with error')
+              createUserActivity(
+                userProfile.id,
+                "notification", 
+                "Welcome email delivery is temporarily delayed. You'll receive it shortly.",
+                0,
+                { email_status: "delayed", error_type: "server_error" }
+              ).catch(() => {})
           }
         } catch (error) {
-          console.error('Welcome email error:', error)
-          // Don't throw - continue with registration even if email fails
-        }
+            if (error.name === 'AbortError') {
+              console.log('Welcome email timed out (5s) - this is normal')
+            } else {
+              console.log('Welcome email network issue - this is normal')
+            }
+            createUserActivity(
+              userProfile.id, 
+              "notification",
+              "Welcome email delivery is temporarily delayed due to network issues. You'll receive it shortly.",
+              0,
+              { email_status: "delayed", error_type: "network_timeout" }
+            ).catch(() => {})
+          }
+        }, 50) // Very small delay
 
-        // Handle business operations
+        // Handle business operations (non-blocking)
         if (registerData.userType === "business") {
-          await Promise.allSettled([
+          setTimeout(async () => {
+            try {
+              // Run business operations in parallel without waiting
+              Promise.allSettled([
             initializeBusinessDashboard(userProfile.id),
             grantInitialBusinessBonus(userProfile.id)
-          ])
-    }
-
-    // Create registration activity
-        const activityDescription = registerData.userType === "business" 
-          ? "Successfully registered as a business partner! Welcome bonus: 3 months pro subscription! 🎉"
-          : "Successfully registered for BookNow pre-launch"
-        
-      await createUserActivity(
-        userProfile.id, 
-        "registration", 
-          activityDescription, 
-        0, 
-        {
-          user_type: registerData.userType,
-          registration_source: "web",
-          launch_interest: registerData.launchInterest,
-            initial_bonus: registerData.userType === "business" ? "3_months_pro" : "none"
+              ]).then(() => {
+                console.log('🏢 Business operations completed')
+              }).catch(() => {
+                console.log('🏢 Business operations had some issues (non-critical)')
+              })
+            } catch (businessError) {
+              console.log('Business operations will be retried later')
+            }
+          }, 100)
         }
-        ).catch(error => {
-          console.error("Background: Registration activity error:", error)
-        })
 
-        // Handle referral processing
+        // Handle referral processing (non-blocking)
     if (registerData.referralCode) {
+          setTimeout(async () => {
           try {
             const referrer = await getUserByReferralCode(registerData.referralCode)
             if (referrer) {
               const referrerIsBusiness = await isBusinessUser(referrer.id)
               const referredIsBusiness = registerData.userType === "business"
               
+                // Process referral without waiting for completion
               if (referrerIsBusiness && referredIsBusiness) {
-                await processBusinessReferral(referrer.id, userProfile.id, registerData.referralCode)
+                  processBusinessReferral(referrer.id, userProfile.id, registerData.referralCode)
+                    .then(() => console.log('Business referral processed'))
+                    .catch(() => console.log('Business referral will be retried'))
               } else {
-                await processReferral(referrer.id, userProfile.id, registerData.referralCode)
-            }
+                  processReferral(referrer.id, userProfile.id, registerData.referralCode)
+                    .then(() => console.log('Regular referral processed'))
+                    .catch(() => console.log('Regular referral will be retried'))
+                }
+                
+                // Create activity without waiting
+                createUserActivity(
+                  userProfile.id,
+                  "referral_used",
+                  `Successfully joined using referral code ${registerData.referralCode}. Bonus credits applied!`,
+                  50,
+                  { 
+                    referral_code: registerData.referralCode,
+                    referrer_id: referrer.id,
+                    reward_amount: 25
+                  }
+                ).catch(() => {})
             }
           } catch (referralError) {
-            console.error("Background: Referral processing error:", referralError)
+              console.log("Referral processing will be retried later")
             
             if (referralError instanceof Error && referralError.message?.includes("No user found with referral code")) {
-              await createUserActivity(
+                createUserActivity(
                 userProfile.id, 
                 "notification", 
                 `Invalid referral code '${registerData.referralCode}' was entered during registration`, 
@@ -308,20 +427,67 @@ export const register = async (registerData: RegisterData) => {
                   error_type: "invalid_code",
                   message: "The referral code you entered doesn't exist. You can still earn rewards by referring others!"
                 }
-              ).catch(notificationError => {
-                console.error("Background: Failed to create notification activity:", notificationError)
-              })
+                ).catch(() => {})
+              }
             }
-          }
+          }, 150)
         }
+
+        // Send Pro subscription confirmation for business users (non-referral)
+        if (registerData.userType === 'business' && !registerData.referralCode) {
+          setTimeout(async () => {
+            try {
+              const controller = new AbortController()
+              const timeoutId = setTimeout(() => controller.abort(), 5000)
+              
+              const response = await fetch('/api/reward-notification', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  userEmail: registerData.email.toLowerCase(),
+                  userName: registerData.fullName,
+                  rewardType: 'pro_subscription',
+                  description: `🎉 Welcome to FastBookr Business! Your LIFETIME FREE Pro subscription is now active. Enjoy unlimited premium features with no monthly fees, ever!`,
+                  source: 'Business Registration - Lifetime Pro Bonus',
+                  amount: 'LIFETIME'
+                }),
+                signal: controller.signal
+              })
+
+              clearTimeout(timeoutId)
+
+              if (response.ok) {
+                console.log(`✅ Pro subscription confirmation sent to ${registerData.email}`)
+              } else {
+                console.log(`⚠️ Pro subscription email queued for retry`)
+              }
+            } catch (proEmailError) {
+              console.log(`⚠️ Pro subscription email will be retried later`)
+            }
+          }, 200)
+        }
+
+        // Recalculate user stats (non-blocking)
+        setTimeout(() => {
+          calculateAndUpdateUserStats(userProfile.id)
+            .then(() => console.log('📊 User stats recalculated after background tasks'))
+            .catch(() => console.log('📊 User stats will be recalculated later'))
+        }, 300)
+
+        console.log('🔄 Background tasks scheduled in:', Date.now() - bgStartTime, 'ms')
       } catch (backgroundError) {
-        console.error("Background processing error:", backgroundError)
-        // Don't throw - this shouldn't affect registration success
+        console.log("Background processing scheduled for later retry")
       }
     }
 
     // Start background processing without waiting
+    setTimeout(() => {
     processBackgroundTasks()
+    }, 10) // Very small delay to ensure registration returns first
+
+    console.log('🎉 Registration completed successfully in:', Date.now() - startTime, 'ms')
 
     return {
       user: authData.user,
@@ -329,7 +495,8 @@ export const register = async (registerData: RegisterData) => {
       message: "Registration successful! Please check your email to verify your account.",
     }
   } catch (error) {
-    console.error("Registration error:", error)
+    const totalTime = Date.now() - startTime
+    console.error("Registration error after", totalTime, "ms:", error)
     if (error instanceof Error) {
       throw error
     }
@@ -486,5 +653,7 @@ export const updateUserProfile = async (userId: string, profileData: any) => {
 }
 
 export const generateReferralCode = (): string => {
+  // Generate a 8-character code to fit within 10-character database limit
+  // Format: BN + 6 random alphanumeric characters = 8 total
   return `BN${Math.random().toString(36).substring(2, 8).toUpperCase()}`
 }

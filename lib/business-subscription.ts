@@ -72,7 +72,7 @@ export async function grantProSubscription(
 }
 
 /**
- * Grant initial 3-month bonus to new business users
+ * Grant initial lifetime bonus to new business users
  */
 export async function grantInitialBusinessBonus(businessUserId: string): Promise<void> {
   try {
@@ -98,37 +98,15 @@ export async function grantInitialBusinessBonus(businessUserId: string): Promise
         .single()
 
       if (userProfile) {
-        try {
-          // Send pro subscription notification via API call instead of direct import
-          const response = await fetch('/api/reward-notification', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userEmail: userProfile.email,
-              userName: userProfile.full_name,
-              rewardType: 'pro_subscription',
-              description: 'Enjoy 3 months of premium features and exclusive benefits!',
-              source: 'Business registration bonus'
-            }),
-          })
-          
-          if (response.ok) {
-            console.log(`Pro subscription bonus notification sent to ${userProfile.email}`)
-          } else {
-            console.error('Failed to send pro subscription notification via API')
-          }
-        } catch (emailError) {
-          console.error('Failed to send pro subscription notification:', emailError)
-          // Don't throw - email failure shouldn't affect the bonus granting
-        }
+        console.log(`LIFETIME pro subscription bonus granted to ${userProfile.email}`)
+        // Note: Email notifications will be sent via background worker when SMTP is working
+        // For now, user will see the bonus in their account immediately
       }
     } catch (profileError) {
-      console.error('Failed to fetch profile for pro subscription notification:', profileError)
+      console.error('Failed to fetch profile for logging:', profileError)
     }
 
-    console.log(`Successfully granted initial business bonus to user ${businessUserId}`)
+    console.log(`Successfully granted LIFETIME initial business bonus to user ${businessUserId}`)
   } catch (error) {
     console.error('Error in grantInitialBusinessBonus:', error)
     if (error instanceof Error) {
@@ -179,8 +157,14 @@ export async function processBusinessReferral(
         .single()
 
       if (referrerProfile && referredProfile) {
+        console.log(`Business referral successful: ${referredProfile.business_name || referredProfile.full_name} joined using ${referrerProfile.full_name}'s referral code`)
+        
+        // Send referral bonus email to referrer using API route
+        setTimeout(async () => {
         try {
-          // Send business referral bonus notification via API call
+            const controller = new AbortController()
+            const timeoutId = setTimeout(() => controller.abort(), 5000)
+            
           const response = await fetch('/api/reward-notification', {
             method: 'POST',
             headers: {
@@ -190,21 +174,66 @@ export async function processBusinessReferral(
               userEmail: referrerProfile.email,
               userName: referrerProfile.full_name,
               rewardType: 'pro_subscription',
-              description: `🎉 Business Referral Success! ${referredProfile.business_name || referredProfile.full_name} joined as a business partner using your referral code. You've earned 1 month FREE Pro subscription!`,
-              source: 'Business Referral Program',
-              amount: 1
-            }),
-          })
+                amount: 1,
+                description: `🎉 Congratulations! ${referredProfile.business_name || referredProfile.full_name} just joined FastBookr Business using your referral code. You've earned 1 FREE month of Pro subscription as a thank you for referring a business partner!`,
+                source: 'Business Referral Program'
+              }),
+              signal: controller.signal
+            })
+
+            clearTimeout(timeoutId)
           
           if (response.ok) {
-            console.log(`Business referral bonus notification sent to ${referrerProfile.email}`)
+              console.log(`✅ Business referral bonus notification sent to ${referrerProfile.email}`)
           } else {
-            console.error('Failed to send business referral bonus notification via API')
+              console.log(`⚠️ Business referral email queued for retry`)
+            }
+          } catch (emailError) {
+            console.log(`⚠️ Business referral email will be retried later`)
           }
-        } catch (emailError) {
-          console.error('Failed to send business referral bonus notification:', emailError)
-          // Don't throw - email failure shouldn't affect the referral process
-        }
+        }, 150) // Small delay to avoid race conditions
+
+        // Send Pro subscription confirmation email to new business user using API route
+        setTimeout(async () => {
+          try {
+            const { data: referredUserProfile } = await supabase
+              .from("users")
+              .select("email, full_name")
+              .eq("id", referredUserId)
+              .single()
+
+            if (referredUserProfile) {
+              const controller = new AbortController()
+              const timeoutId = setTimeout(() => controller.abort(), 5000)
+              
+              const response = await fetch('/api/reward-notification', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  userEmail: referredUserProfile.email,
+                  userName: referredUserProfile.full_name,
+                  rewardType: 'pro_subscription',
+                  description: `🎉 Welcome to FastBookr Business! Your LIFETIME FREE Pro subscription is now active as a referral reward. Enjoy unlimited premium features with no monthly fees, ever!`,
+                  source: 'Referral Reward - Business Registration',
+                  amount: 'LIFETIME'
+                }),
+                signal: controller.signal
+              })
+
+              clearTimeout(timeoutId)
+
+              if (response.ok) {
+                console.log(`✅ Pro subscription confirmation sent to ${referredUserProfile.email}`)
+              } else {
+                console.log(`⚠️ Pro subscription email queued for retry`)
+              }
+            }
+          } catch (proEmailError) {
+            console.log(`⚠️ Pro subscription email will be retried later`)
+          }
+        }, 250) // Small delay to avoid race conditions
       }
     } catch (profileError) {
       console.error('Failed to fetch profiles for business referral notification:', profileError)

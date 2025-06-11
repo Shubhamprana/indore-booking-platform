@@ -128,17 +128,70 @@ export const getUserByReferralCode = async (referralCode: string): Promise<User>
   return data
 }
 
-export const createUser = async (userData: Omit<User, "created_at" | "updated_at">): Promise<User> => {
+export const createUser = async (userData: {
+  id: string // This should be the UUID from Supabase Auth
+  email: string
+  full_name: string
+  phone: string
+  location: string
+  user_type: "customer" | "business"
+  referral_code: string
+  service_interests?: string[]
+  business_name?: string
+  business_category?: string
+  business_description?: string
+  current_booking_method?: string
+  launch_interest?: number
+  marketing_consent?: boolean
+  whatsapp_updates?: boolean
+  early_access_interest?: boolean
+  share_on_social?: boolean
+  email_verified?: boolean
+}) => {
+  try {
+    console.log('📝 Creating user profile with ID:', userData.id)
+    
   const { data, error } = await supabase
     .from("users")
-    .insert([userData])
+      .insert([{
+        id: userData.id, // Use the UUID from Supabase Auth directly
+        email: userData.email,
+        full_name: userData.full_name,
+        phone: userData.phone,
+        location: userData.location,
+        user_type: userData.user_type,
+        referral_code: userData.referral_code,
+        service_interests: userData.service_interests || [],
+        business_name: userData.business_name,
+        business_category: userData.business_category,
+        business_description: userData.business_description,
+        current_booking_method: userData.current_booking_method,
+        launch_interest: userData.launch_interest || 5,
+        marketing_consent: userData.marketing_consent || false,
+        whatsapp_updates: userData.whatsapp_updates || false,
+        early_access_interest: userData.early_access_interest || false,
+        share_on_social: userData.share_on_social || false,
+        email_verified: userData.email_verified || false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }])
     .select()
     .single()
 
   if (error) {
-    throw new Error(`Failed to create user: ${error.message}`)
+      console.error('❌ User creation error:', error)
+      throw new Error(`Failed to create user profile: ${error.message}`)
   }
-  return data
+
+    console.log('✅ User profile created successfully')
+    return data
+  } catch (error) {
+    console.error("Error creating user:", error)
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Failed to create user profile")
+  }
 }
 
 export const updateUser = async (userId: string, updates: Partial<User>): Promise<User> => {

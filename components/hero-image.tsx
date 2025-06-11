@@ -31,7 +31,7 @@ export function HeroImage() {
       <div className="relative z-10">
         <img
           src="/hero-section-image.png"
-          alt="BookNow App Preview"
+          alt="FastBookr App Preview"
           width={500}
           height={600}
           className="rounded-2xl shadow-2xl"

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -22,6 +22,7 @@ import {
   CheckCircle,
   ArrowRight,
   Globe,
+  Calendar,
   Gift,
   Menu,
   X,
@@ -60,9 +61,20 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [selectedLocation, setSelectedLocation] = useState("Select your city")
   const [email, setEmail] = useState("")
+  const [showFloatingCTA, setShowFloatingCTA] = useState(false)
   
   // Get authentication state
   const { profile, loading: authLoading, signOut } = useAuth()
+
+  // Show floating CTA when user scrolls down on mobile
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY > 400
+      setShowFloatingCTA(scrolled)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   const services = [
     { icon: Utensils, name: "Restaurants", count: "500+", image: "/placeholder.svg?height=200&width=300" },
@@ -245,14 +257,17 @@ export default function HomePage() {
       <FloatingElements />
 
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-          <div className="flex justify-between items-center h-14 sm:h-16">
-            <Link href="/" className="flex items-center space-x-1 sm:space-x-2">
-              <Image src="/logo-without-name.png" alt="FastBookr Logo" width={32} height={32} className="sm:w-10 sm:h-10 rounded-lg" />
-              <span className="text-lg sm:text-xl font-bold text-gray-900">FastBookr</span>
-              <Badge variant="secondary" className="ml-1 sm:ml-2 bg-orange-100 text-orange-800 text-xs px-1 py-0.5 sm:px-2 sm:py-1">
-                Pre-Launch
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 md:h-16">
+            {/* Logo - Smaller on mobile */}
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="w-7 h-7 md:w-8 md:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <Calendar className="w-4 h-4 md:w-5 md:h-5 text-white" />
+              </div>
+              <span className="text-lg md:text-xl font-bold text-gray-900">FastBookr</span>
+              <Badge variant="secondary" className="ml-1 md:ml-2 bg-orange-100 text-orange-800 text-xs px-1.5 py-0.5">
+                Beta
               </Badge>
             </Link>
 
@@ -269,34 +284,36 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <div className="hidden xs:block">
+            <div className="flex items-center space-x-2 md:space-x-4">
+              {/* Location selector - Hidden on mobile to save space */}
+              <div className="hidden sm:block">
               <LocationSelector selectedLocation={selectedLocation} onLocationChange={setSelectedLocation} />
               </div>
 
-              {/* Language Toggle - Always visible */}
+              {/* Language Toggle - Smaller on mobile */}
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setLanguage(language === "en" ? "hi" : "en")}
-                className="flex items-center space-x-1 px-2 py-1 text-xs sm:text-sm"
+                className="flex items-center space-x-1 h-8 px-2 md:h-9 md:px-3"
               >
-                <Globe className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">{language === "en" ? "हिं" : "EN"}</span>
+                <Globe className="w-3 h-3 md:w-4 md:h-4" />
+                <span className="text-xs md:text-sm">{language === "en" ? "हिं" : "EN"}</span>
               </Button>
 
-              <div className="hidden md:flex items-center space-x-2">
+              {/* Mobile-first Auth Buttons */}
+              <div className="flex items-center space-x-2">
                 {!authLoading && profile ? (
-                  // Logged in user
+                  // Logged in user - Show on both mobile and desktop
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full">
-                        <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
+                      <Button variant="ghost" className="relative h-8 w-8 md:h-10 md:w-10 rounded-full">
+                        <Avatar className="h-8 w-8 md:h-10 md:w-10">
                           <AvatarImage 
                             src={profile.profile_image_url || "/placeholder.svg?height=40&width=40"} 
                             alt={profile.full_name || "User"} 
                           />
-                          <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs sm:text-sm">
+                          <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm">
                             {profile.full_name ? profile.full_name.charAt(0).toUpperCase() : "U"}
                           </AvatarFallback>
                         </Avatar>
@@ -340,123 +357,72 @@ export default function HomePage() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : !authLoading ? (
-                  // Not logged in
+                  // Not logged in - Show directly on mobile AND desktop for better UX
                   <>
                 <Link href="/login">
-                  <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-3">{t.nav.login}</Button>
+                      <Button variant="outline" size="sm" className="h-8 px-3 md:h-9 md:px-4 text-xs md:text-sm">
+                        {t.nav.login}
+                      </Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xs sm:text-sm px-2 sm:px-3">
+                      <Button size="sm" className="h-8 px-3 md:h-9 md:px-4 text-xs md:text-sm bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                     {t.nav.signup}
                   </Button>
                 </Link>
                   </>
                 ) : (
                   // Loading state
-                  <div className="flex items-center space-x-1 sm:space-x-2">
-                    <div className="h-8 w-12 sm:h-10 sm:w-16 bg-gray-200 rounded animate-pulse"></div>
-                    <div className="h-8 w-16 sm:h-10 sm:w-20 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="flex items-center space-x-2">
+                    <div className="h-8 w-12 md:h-10 md:w-16 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-8 w-16 md:h-10 md:w-20 bg-gray-200 rounded animate-pulse"></div>
                   </div>
                 )}
               </div>
 
-              {/* Mobile menu button */}
+              {/* Mobile menu button - Only show if not logged in to save space */}
+              {(!profile || authLoading) && (
               <Button
                 variant="outline"
                 size="sm"
-                className="md:hidden p-1 sm:p-2"
+                  className="md:hidden h-8 w-8 p-0"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
-                {mobileMenuOpen ? <X className="w-3 h-3 sm:w-4 sm:h-4" /> : <Menu className="w-3 h-3 sm:w-4 sm:h-4" />}
+                  {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
               </Button>
+              )}
             </div>
           </div>
 
-          {/* Mobile Navigation */}
-          {mobileMenuOpen && (
-            <div className="md:hidden border-t border-gray-200 py-3 sm:py-4">
-              <div className="flex flex-col space-y-3 sm:space-y-4">
-                <div className="block xs:hidden mb-2">
-                  <LocationSelector selectedLocation={selectedLocation} onLocationChange={setSelectedLocation} />
-                </div>
-                
-                <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors text-sm sm:text-base">
+          {/* Mobile Navigation - Simplified */}
+          {mobileMenuOpen && (!profile || authLoading) && (
+            <div className="md:hidden border-t border-gray-200 py-3 bg-white">
+              <div className="flex flex-col space-y-3">
+                <Link 
+                  href="/" 
+                  className="text-gray-700 hover:text-blue-600 transition-colors py-2 text-sm"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
                   {t.nav.home}
                 </Link>
-                <Link href="/about" className="text-gray-700 hover:text-blue-600 transition-colors text-sm sm:text-base">
+                <Link 
+                  href="/about" 
+                  className="text-gray-700 hover:text-blue-600 transition-colors py-2 text-sm"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
                   {t.nav.about}
                 </Link>
-                <Link href="/contact" className="text-gray-700 hover:text-blue-600 transition-colors text-sm sm:text-base">
+                <Link 
+                  href="/contact" 
+                  className="text-gray-700 hover:text-blue-600 transition-colors py-2 text-sm"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
                   {t.nav.contact}
                 </Link>
                 
-                {!authLoading && profile ? (
-                  // Logged in user - mobile
-                  <div className="pt-3 sm:pt-4 border-t border-gray-200">
-                    <div className="flex items-center space-x-3 mb-3 sm:mb-4">
-                      <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
-                        <AvatarImage 
-                          src={profile.profile_image_url || "/placeholder.svg?height=40&width=40"} 
-                          alt={profile.full_name || "User"} 
-                        />
-                        <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs sm:text-sm">
-                          {profile.full_name ? profile.full_name.charAt(0).toUpperCase() : "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{profile.full_name || "User"}</p>
-                        <p className="text-xs sm:text-sm text-gray-600 truncate">{profile.email}</p>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Link href="/profile" className="flex-1">
-                        <Button variant="outline" className="w-full justify-start text-sm h-9 sm:h-10">
-                          <User className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                          Profile
-                        </Button>
-                      </Link>
-                      {profile.user_type === 'business' && (
-                        <Link href="/business/dashboard" className="flex-1">
-                          <Button variant="outline" className="w-full justify-start text-sm h-9 sm:h-10">
-                            <Building className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                            Dashboard
-                          </Button>
-                        </Link>
-                      )}
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 text-sm h-9 sm:h-10"
-                        onClick={async () => {
-                          await signOut()
-                          window.location.href = "/"
-                        }}
-                      >
-                        <LogOut className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                        Log out
-                      </Button>
-                    </div>
-                  </div>
-                ) : !authLoading ? (
-                  // Not logged in - mobile
-                <div className="flex space-x-2 pt-3 sm:pt-4 border-t border-gray-200">
-                  <Link href="/login" className="flex-1">
-                    <Button variant="outline" className="w-full text-sm h-9 sm:h-10">
-                      {t.nav.login}
-                    </Button>
-                  </Link>
-                  <Link href="/register" className="flex-1">
-                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-sm h-9 sm:h-10">{t.nav.signup}</Button>
-                  </Link>
+                {/* Mobile Location Selector */}
+                <div className="pt-2 border-t border-gray-100">
+                  <LocationSelector selectedLocation={selectedLocation} onLocationChange={setSelectedLocation} />
                 </div>
-                ) : (
-                  // Loading state - mobile
-                  <div className="pt-3 sm:pt-4 border-t border-gray-200">
-                    <div className="flex space-x-2">
-                      <div className="h-9 sm:h-10 flex-1 bg-gray-200 rounded animate-pulse"></div>
-                      <div className="h-9 sm:h-10 flex-1 bg-gray-200 rounded animate-pulse"></div>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           )}
@@ -465,71 +431,89 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pt-8 sm:pt-12 md:pt-20 pb-8 sm:pb-12 md:pb-16">
-          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
-            <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in-up">
-              <div className="space-y-3 sm:space-y-4">
-                <Badge className="bg-gradient-to-r from-orange-100 to-red-100 text-orange-800 border-orange-200 text-xs px-2 py-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 md:pt-20 pb-12 md:pb-16">
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div className="space-y-6 md:space-y-8 animate-fade-in-up text-center lg:text-left">
+              <div className="space-y-3 md:space-y-4">
+                <Badge className="bg-gradient-to-r from-orange-100 to-red-100 text-orange-800 border-orange-200 text-sm">
                   {t.hero.badge}
                 </Badge>
-                <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 leading-tight">
                   {t.hero.headline}
                   <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
                     {t.hero.subheading}
                   </span>
                 </h1>
-                <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed">{t.hero.description}</p>
-                <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-500">
-                  <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                <p className="text-lg md:text-xl text-gray-600 leading-relaxed">{t.hero.description}</p>
+                <div className="flex items-center justify-center lg:justify-start space-x-2 text-sm text-gray-500">
+                  <Clock className="w-4 h-4" />
                   <span>{t.hero.launchDate}</span>
                 </div>
               </div>
 
               {/* Quick Email Signup - Mobile Optimized */}
-              <form onSubmit={handleQuickSignup} className="w-full">
-                <div className="flex flex-col gap-2 sm:gap-3 md:flex-row md:gap-0 md:relative">
+              <form onSubmit={handleQuickSignup} className="relative w-full">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-0">
                 <Input
                   type="email"
                   placeholder={t.hero.searchPlaceholder}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                    className="w-full md:pr-36 py-3 sm:py-4 md:py-6 text-sm sm:text-base md:text-lg border-2 border-gray-200 focus:border-blue-500 rounded-xl"
+                    className="flex-1 px-4 py-4 md:py-6 text-base md:text-lg border-2 border-gray-200 focus:border-blue-500 rounded-xl sm:rounded-r-none sm:pr-2"
                   required
                 />
                 <Button
                   type="submit"
-                    className="w-full md:w-auto md:absolute md:right-2 md:top-1/2 md:transform md:-translate-y-1/2 bg-gradient-to-r from-blue-600 to-purple-600 py-3 sm:py-4 md:py-2 text-sm md:text-sm"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 py-4 md:py-6 px-6 rounded-xl sm:rounded-l-none text-base md:text-lg font-medium"
                 >
                   {t.hero.earlyAccess}
                 </Button>
                 </div>
               </form>
 
-              <div className="flex flex-col gap-2 sm:gap-3 md:flex-row md:gap-4">
-                <Link href="/register" className="w-full md:w-auto">
+              {/* Mobile-First CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full">
+                <Link href="/register" className="flex-1 sm:flex-initial">
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 w-full h-11 sm:h-12 md:h-auto"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full"
                   >
                     {t.hero.cta}
-                    <ArrowRight className="ml-2 w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                    <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5" />
                   </Button>
                 </Link>
-                <Link href="/referral" className="w-full md:w-auto">
-                  <Button variant="outline" size="lg" className="text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 w-full h-11 sm:h-12 md:h-auto">
-                    <Share2 className="mr-2 w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                <Link href="/referral" className="flex-1 sm:flex-initial">
+                  <Button variant="outline" size="lg" className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full">
+                    <Share2 className="mr-2 w-4 h-4 md:w-5 md:h-5" />
                     Refer & Earn
                   </Button>
                 </Link>
               </div>
 
+              {/* Mobile Quick Actions - Show login/signup prominently if not logged in */}
+              {!profile && !authLoading && (
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl border border-blue-100 sm:hidden">
+                  <p className="text-sm text-gray-600 mb-3 text-center">Already have an account?</p>
+                  <div className="flex gap-2">
+                    <Link href="/login" className="flex-1">
+                      <Button variant="outline" className="w-full">
+                        Login
+                      </Button>
+                    </Link>
+                    <Link href="/register" className="flex-1">
+                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600">
+                        Sign Up Free
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
+
               {/* Launch Countdown */}
               {/* <LaunchCountdown />  #commented out for now */}
             </div>
 
-            <div className="order-first lg:order-last mt-4 sm:mt-0">
             <HeroImage />
-            </div>
           </div>
         </div>
       </section>
@@ -539,13 +523,13 @@ export default function HomePage() {
 
       {/* Business Search & Follow Section - Only for logged in users */}
       {profile && !authLoading && (
-        <section className="py-12 sm:py-20 bg-gradient-to-br from-blue-50 to-indigo-50">
+        <section className="py-20 bg-gradient-to-br from-blue-50 to-indigo-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 Discover & Connect with Businesses
               </h2>
-              <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Find and follow local businesses
               </p>
             </div>
@@ -574,33 +558,33 @@ export default function HomePage() {
       />
 
       {/* Value Propositions */}
-      <section className="py-12 sm:py-20 bg-white">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">Exclusive Pre-Launch Benefits</h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Exclusive Pre-Launch Benefits</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Join now and get amazing perks that won't be available after launch
             </p>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+          <div className="grid lg:grid-cols-2 gap-12">
             {/* For Customers */}
-            <Card className="p-6 sm:p-8 border-2 border-blue-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl">
+            <Card className="p-8 border-2 border-blue-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl">
               <CardContent className="p-0">
-                <div className="flex flex-col sm:flex-row sm:items-center mb-6">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 sm:mb-0 sm:mr-4">
+                <div className="flex items-center mb-6">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
                     <Users className="w-6 h-6 text-blue-600" />
                   </div>
-                  <div className="text-center sm:text-left">
-                    <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{t.valueProps.customers.title}</h3>
-                    <p className="text-sm sm:text-base text-gray-600">{t.valueProps.customers.subtitle}</p>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">{t.valueProps.customers.title}</h3>
+                    <p className="text-gray-600">{t.valueProps.customers.subtitle}</p>
                   </div>
                 </div>
                 <ul className="space-y-3">
                   {t.valueProps.customers.benefits.map((benefit, index) => (
-                    <li key={index} className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm sm:text-base text-gray-700">{benefit}</span>
+                    <li key={index} className="flex items-center">
+                      <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                      <span className="text-gray-700">{benefit}</span>
                     </li>
                   ))}
                 </ul>
@@ -608,22 +592,22 @@ export default function HomePage() {
             </Card>
 
             {/* For Businesses */}
-            <Card className="p-6 sm:p-8 border-2 border-purple-100 hover:border-purple-200 transition-all duration-300 hover:shadow-xl">
+            <Card className="p-8 border-2 border-purple-100 hover:border-purple-200 transition-all duration-300 hover:shadow-xl">
               <CardContent className="p-0">
-                <div className="flex flex-col sm:flex-row sm:items-center mb-6">
-                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4 sm:mb-0 sm:mr-4">
+                <div className="flex items-center mb-6">
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
                     <TrendingUp className="w-6 h-6 text-purple-600" />
                   </div>
-                  <div className="text-center sm:text-left">
-                    <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{t.valueProps.businesses.title}</h3>
-                    <p className="text-sm sm:text-base text-gray-600">{t.valueProps.businesses.subtitle}</p>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">{t.valueProps.businesses.title}</h3>
+                    <p className="text-gray-600">{t.valueProps.businesses.subtitle}</p>
                   </div>
                 </div>
                 <ul className="space-y-3">
                   {t.valueProps.businesses.benefits.map((benefit, index) => (
-                    <li key={index} className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm sm:text-base text-gray-700">{benefit}</span>
+                    <li key={index} className="flex items-center">
+                      <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                      <span className="text-gray-700">{benefit}</span>
                     </li>
                   ))}
                 </ul>
@@ -634,26 +618,26 @@ export default function HomePage() {
       </section>
 
       {/* How It Will Work */}
-      <section className="py-12 sm:py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">{t.howItWorks.title}</h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">{t.howItWorks.subtitle}</p>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{t.howItWorks.title}</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">{t.howItWorks.subtitle}</p>
           </div>
 
-          <div className="grid gap-8 sm:gap-12 md:grid-cols-3">
+          <div className="grid md:grid-cols-3 gap-8">
             {t.howItWorks.steps.map((step, index) => (
               <div key={index} className="text-center group">
                 <div className="relative mb-6">
-                  <div className="w-12 sm:w-16 h-12 sm:h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                    <span className="text-lg sm:text-2xl font-bold text-white">{index + 1}</span>
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <span className="text-2xl font-bold text-white">{index + 1}</span>
                   </div>
                   {index < 2 && (
-                    <div className="hidden md:block absolute top-6 sm:top-8 left-full w-full h-0.5 bg-gradient-to-r from-blue-200 to-purple-200 transform -translate-x-8"></div>
+                    <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-blue-200 to-purple-200 transform -translate-x-8"></div>
                   )}
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
-                <p className="text-sm sm:text-base text-gray-600 px-2">{step.description}</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
+                <p className="text-gray-600">{step.description}</p>
               </div>
             ))}
           </div>
@@ -661,43 +645,43 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-8 sm:py-12 md:py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
-          <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 md:mb-6">Ready to Be Part of the Revolution?</h2>
-          <p className="text-sm sm:text-lg md:text-xl text-blue-100 mb-4 sm:mb-6 md:mb-8 max-w-2xl mx-auto">
+      <section className="py-12 md:py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6">Ready to Be Part of the Revolution?</h2>
+          <p className="text-lg md:text-xl text-blue-100 mb-6 md:mb-8 max-w-2xl mx-auto">
             Join thousands of early adopters waiting for the future of booking. Limited spots available!
           </p>
 
-          <div className="flex flex-col gap-2 sm:gap-3 md:flex-row md:gap-4 justify-center">
-            <Link href="/register?type=customer" className="w-full md:w-auto">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 w-full h-11 sm:h-12 md:h-auto">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center max-w-md sm:max-w-none mx-auto">
+            <Link href="/register?type=customer" className="flex-1 sm:flex-initial">
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full">
                 Join as Customer
-                <Users className="ml-2 w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                <Users className="ml-2 w-4 h-4 md:w-5 md:h-5" />
               </Button>
             </Link>
-            <Link href="/register?type=business" className="w-full md:w-auto">
+            <Link href="/register?type=business" className="flex-1 sm:flex-initial">
               <Button
                 variant="outline"
                 size="lg"
-                className="bg-white text-blue-600 hover:bg-gray-100 text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 w-full h-11 sm:h-12 md:h-auto border-white"
+                className="bg-white text-blue-600 hover:bg-gray-100 text-base md:text-lg px-6 md:px-8 py-4 md:py-6 w-full border-white hover:border-gray-100"
               >
                 Partner with Us
-                <TrendingUp className="ml-2 w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                <TrendingUp className="ml-2 w-4 h-4 md:w-5 md:h-5" />
               </Button>
             </Link>
           </div>
 
-          <div className="mt-4 sm:mt-6 md:mt-8 flex flex-col xs:flex-row items-center justify-center space-y-2 xs:space-y-0 xs:space-x-4 sm:space-x-8 text-xs sm:text-sm text-blue-100">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-blue-100">
             <div className="flex items-center">
-              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-300 mr-2" />
+              <CheckCircle className="w-4 h-4 text-green-300 mr-2" />
               Free to join
             </div>
             <div className="flex items-center">
-              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-300 mr-2" />
+              <CheckCircle className="w-4 h-4 text-green-300 mr-2" />
               Exclusive benefits
             </div>
             <div className="flex items-center">
-              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-300 mr-2" />
+              <CheckCircle className="w-4 h-4 text-green-300 mr-2" />
               Early access guaranteed
             </div>
           </div>
@@ -705,30 +689,32 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-6 sm:py-8 md:py-12">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-            <div className="col-span-1 sm:col-span-2 md:col-span-2">
-              <Link href="/" className="flex items-center space-x-2 mb-3 sm:mb-4">
-                <Image src="/logo-without-name.png" alt="FastBookr Logo" width={32} height={32} className="sm:w-10 sm:h-10 rounded-lg" />
-                <span className="text-lg sm:text-xl font-bold">FastBookr</span>
-                <Badge variant="secondary" className="bg-orange-100 text-orange-800 text-xs px-1 py-0.5 sm:px-2 sm:py-1">
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="col-span-1 md:col-span-2">
+              <Link href="/" className="flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold">FastBookr</span>
+                <Badge variant="secondary" className="bg-orange-100 text-orange-800">
                   Pre-Launch
                 </Badge>
               </Link>
-              <p className="text-xs sm:text-sm md:text-base text-gray-400 mb-3 sm:mb-4 max-w-md leading-relaxed">
+              <p className="text-gray-400 mb-4 max-w-md">
                 Revolutionizing the booking experience worldwide. Join the waitlist and be the first to experience the
                 future of booking.
               </p>
-              <div className="flex items-center text-gray-400 text-xs sm:text-sm md:text-base">
-                <Globe className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <div className="flex items-center text-gray-400">
+                <Globe className="w-4 h-4 mr-2" />
                 <span>Launching Worldwide Soon</span>
               </div>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-2 sm:mb-3 md:mb-4 text-sm sm:text-base">Quick Links</h4>
-              <ul className="space-y-1.5 sm:space-y-2 text-gray-400 text-xs sm:text-sm md:text-base">
+              <h4 className="font-semibold mb-4">Quick Links</h4>
+              <ul className="space-y-2 text-gray-400">
                 <li>
                   <Link href="/about" className="hover:text-white transition-colors">
                     About Us
@@ -753,8 +739,8 @@ export default function HomePage() {
             </div>
 
             <div>
-              <h4 className="font-semibold mb-2 sm:mb-3 md:mb-4 text-sm sm:text-base">Support</h4>
-              <ul className="space-y-1.5 sm:space-y-2 text-gray-400 text-xs sm:text-sm md:text-base">
+              <h4 className="font-semibold mb-4">Support</h4>
+              <ul className="space-y-2 text-gray-400">
                 <li>
                   <Link href="/contact" className="hover:text-white transition-colors">
                     Help Center
@@ -779,23 +765,46 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-4 sm:mt-6 md:mt-8 pt-4 sm:pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
-            <p className="text-gray-400 text-center md:text-left text-xs sm:text-sm md:text-base">
+          <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p className="text-gray-400 text-center md:text-left">
               &copy; 2024 FastBookr. All rights reserved. Coming soon to revolutionize booking.
             </p>
-            <div className="flex flex-col xs:flex-row space-y-2 xs:space-y-0 xs:space-x-4 text-xs sm:text-sm md:text-base">
-              <div className="flex items-center text-gray-400 justify-center xs:justify-start">
-                <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+            <div className="flex space-x-4 mt-4 md:mt-0">
+              <div className="flex items-center text-gray-400">
+                <Phone className="w-4 h-4 mr-2" />
                 <span>+1-800-FASTBOOKR</span>
               </div>
-              <div className="flex items-center text-gray-400 justify-center xs:justify-start">
-                <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <div className="flex items-center text-gray-400">
+                <Mail className="w-4 h-4 mr-2" />
                 <span>hello@fastbookr.com</span>
               </div>
             </div>
           </div>
         </div>
       </footer>
+
+      {/* Floating Mobile CTA - Only show when not logged in and scrolled */}
+      {!profile && !authLoading && showFloatingCTA && (
+        <div className="fixed bottom-4 left-4 right-4 z-50 md:hidden">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-3 backdrop-blur-md bg-white/95">
+            <div className="flex gap-2">
+              <Link href="/login" className="flex-1">
+                <Button variant="outline" className="w-full text-sm">
+                  Login
+                </Button>
+              </Link>
+              <Link href="/register" className="flex-1">
+                <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-sm">
+                  Join Free
+                </Button>
+              </Link>
+            </div>
+            <p className="text-xs text-gray-500 text-center mt-2">
+              Join thousands waiting for launch! 🚀
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

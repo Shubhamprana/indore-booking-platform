@@ -48,28 +48,13 @@ export default function BusinessReferralBenefits({
               </div>
               
               <div className="space-y-3">
-                <div className="flex items-start gap-3 p-3 bg-white rounded-lg border border-green-200">
-                  <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-green-900">
-                      3 Months FREE Pro Subscription
-                    </p>
-                    <p className="text-sm text-green-700">
-                      Just for registering as a business! No referral needed.
-                    </p>
-                  </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span>LIFETIME FREE Pro Subscription</span>
                 </div>
-                
-                <div className="flex items-start gap-3 p-3 bg-white rounded-lg border border-purple-200">
-                  <Calendar className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-purple-900">
-                      +1 Month Pro per Business Referral
-                    </p>
-                    <p className="text-sm text-purple-700">
-                      Earn 1 additional month of pro subscription for each business you refer.
-                    </p>
-                  </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span>Premium business management tools</span>
                 </div>
               </div>
             </div>
@@ -86,7 +71,7 @@ export default function BusinessReferralBenefits({
                   <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium text-blue-900">
-                      3 Months FREE Pro Subscription
+                      LIFETIME FREE Pro Subscription
                     </p>
                     <p className="text-sm text-blue-700">
                       Same welcome bonus as you received!

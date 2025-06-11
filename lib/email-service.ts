@@ -19,9 +19,11 @@ export async function sendWelcomeEmailDirect(data: WelcomeEmailData) {
       throw new Error('SMTP configuration missing')
     }
 
-    // Create optimized transporter
+    // Create optimized transporter with Gmail SSL (same config as welcome emails)
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.SMTP_EMAIL,
         pass: process.env.SMTP_PASSWORD,
@@ -29,6 +31,9 @@ export async function sendWelcomeEmailDirect(data: WelcomeEmailData) {
       pool: true,
       maxConnections: 3,
       maxMessages: 100,
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
     })
 
     // Generate dynamic content
@@ -77,11 +82,11 @@ export async function sendWelcomeEmailDirect(data: WelcomeEmailData) {
 function getRewardContent(userType: string, hasReferralReward: boolean, businessBonus?: boolean): string {
   if (userType === 'business' && businessBonus) {
     return `
-      <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; border-radius: 12px; margin: 25px 0; text-align: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
-        <h3 style="margin: 0 0 10px 0; font-size: 20px;">🎉 Welcome Bonus Activated!</h3>
-        <p style="margin: 0; font-size: 16px; opacity: 0.95;">
-          <strong>3 Months FREE Pro Subscription</strong><br>
-          Complete business management tools & premium features
+      <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="color: #059669; margin: 0 0 10px 0; font-size: 18px;">🎉 Business Partner Welcome Bonus!</h3>
+        <p style="margin: 0; color: #374151; font-size: 16px;">
+          <strong>LIFETIME FREE Pro Subscription</strong><br>
+          Your premium business features are now active for life! No monthly fees, ever.
         </p>
       </div>
     `

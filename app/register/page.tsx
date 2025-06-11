@@ -49,6 +49,8 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState("Creating your account...")
+  const [registrationAttempts, setRegistrationAttempts] = useState(0)
   const [isClient, setIsClient] = useState(false)
   const [formData, setFormData] = useState({
     // Personal Info
@@ -164,9 +166,12 @@ export default function RegisterPage() {
     }
 
     setIsLoading(true)
+    setLoadingMessage("Creating your account...")
+    setRegistrationAttempts(prev => prev + 1)
 
     // Declare timeout variable outside try block for proper scope
     let registrationTimeout: NodeJS.Timeout | undefined
+    let progressTimeout: NodeJS.Timeout | undefined
 
     try {
       const registerData: RegisterData = {
@@ -189,40 +194,65 @@ export default function RegisterPage() {
         shareOnSocial: formData.shareOnSocial,
       }
 
-      // Set a timeout for registration - optimized to 3 seconds since background processing is async
+      // Progressive loading messages to keep user informed
+      progressTimeout = setTimeout(() => {
+        setLoadingMessage("Setting up your profile...")
+      }, 3000)
+
+      // Set a timeout for registration - 45 seconds to allow for slow database operations
       registrationTimeout = setTimeout(() => {
-        console.error("Registration process timed out after 3 seconds")
+        console.error("Registration process timed out after 45 seconds")
         setIsLoading(false)
+        setLoadingMessage("Creating your account...")
+        
+        if (registrationAttempts < 2) {
         toast({
-          title: "Registration Successful! 🎉",
-          description: "Your account has been created! Background processes are still running - you can log in now.",
-          variant: "default",
+            title: "Registration Taking Longer Than Expected",
+            description: "Your internet connection might be slow. Please try again.",
+            variant: "destructive",
+          })
+        } else if (registrationAttempts < 4) {
+          toast({
+            title: "Network Issues Detected",
+            description: "Please check your internet connection. If the problem persists, try refreshing the page.",
+            variant: "destructive",
         })
-        // Redirect to register-complete page after timeout (but with success message)
-        setTimeout(() => {
-          router.push("/register-complete")
-        }, 2000)
-      }, 5000) // Optimized to 5 seconds with background processing
+        } else {
+          toast({
+            title: "Registration Timeout",
+            description: "There seems to be a technical issue. Please try again later or contact support.",
+            variant: "destructive",
+          })
+        }
+      }, 45000) // 45 seconds for database operations on slow connections
 
       const result = await register(registerData)
       
-      // Clear the timeout since registration completed
+      // Clear all timeouts since registration completed
       if (registrationTimeout) clearTimeout(registrationTimeout)
+      if (progressTimeout) clearTimeout(progressTimeout)
 
       console.log("Registration successful:", result)
 
+      setLoadingMessage("Welcome to FastBookr!")
+
       toast({
         title: "Registration Successful! 🎉",
-        description: "Welcome to the BookNow family! Please check your email to verify your account.",
+        description: "Welcome to the FastBookr family! Please check your email to verify your account.",
       })
+
+      // Reset attempts on success
+      setRegistrationAttempts(0)
 
       // Redirect to register-complete page instead of welcome
       router.push("/register-complete")
     } catch (error: any) {
-      // Clear the timeout in case of error
+      // Clear all timeouts in case of error
       if (registrationTimeout) clearTimeout(registrationTimeout)
+      if (progressTimeout) clearTimeout(progressTimeout)
       
       console.error("Registration error:", error)
+      setLoadingMessage("Creating your account...")
 
       let errorMessage = "Something went wrong. Please try again."
 
@@ -232,6 +262,11 @@ export default function RegisterPage() {
         errorMessage = error.error_description
       }
 
+      // Add retry suggestion for network-related errors
+      if (error.message?.includes("network") || error.message?.includes("timeout") || error.message?.includes("fetch")) {
+        errorMessage = "Network error occurred. Please check your connection and try again."
+      }
+
       toast({
         title: "Registration Failed",
         description: errorMessage,
@@ -239,6 +274,7 @@ export default function RegisterPage() {
       })
     } finally {
       setIsLoading(false)
+      setLoadingMessage("Creating your account...")
     }
   }
 
@@ -393,7 +429,7 @@ export default function RegisterPage() {
                         <div className="bg-purple-50 p-3 sm:p-4 rounded-lg mb-3 sm:mb-4">
                           <h4 className="font-semibold text-purple-900 mb-2 text-sm sm:text-base">🚀 Business Partner Benefits:</h4>
                           <ul className="space-y-1 text-xs sm:text-sm text-purple-800">
-                            <li>• <strong>3 months FREE pro subscription</strong> (just for registering!)</li>
+                            <li>• <strong>LIFETIME FREE pro subscription</strong> (just for registering!)</li>
                             <li>• <strong>+1 month pro free</strong> for each business you refer</li>
                             <li>• Free premium setup & onboarding</li>
                             <li>• Featured listing placement</li>
@@ -788,7 +824,7 @@ export default function RegisterPage() {
                       ) : (
                         <>
                           <li className="flex items-center">
-                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />3 months free premium subscription
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />LIFETIME FREE pro subscription
                           </li>
                           <li className="flex items-center">
                             <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0" />
@@ -976,8 +1012,8 @@ export default function RegisterPage() {
                   {isLoading ? (
                     <div className="flex items-center">
                       <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2"></div>
-                      <span className="hidden sm:inline">Creating Account...</span>
-                      <span className="sm:hidden">Creating...</span>
+                      <span className="hidden sm:inline">{loadingMessage}</span>
+                      <span className="sm:hidden">{loadingMessage.slice(0, 10)}</span>
                     </div>
                   ) : (
                     <>

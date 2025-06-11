@@ -126,20 +126,20 @@ export default function ContactPage() {
       const result = await response.json()
 
       if (response.ok) {
-        toast({
+    toast({
           title: "Message Sent Successfully! 📧",
           description: result.message || "We'll get back to you within 24 hours.",
-        })
+    })
         
-        // Reset form
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          subject: "",
-          category: "",
-          message: "",
-        })
+    // Reset form
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      subject: "",
+      category: "",
+      message: "",
+    })
       } else {
         throw new Error(result.error || 'Failed to send message')
       }
